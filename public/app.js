@@ -117,6 +117,8 @@
     storageMode: HAS_REMOTE ? "remote" : STATIC_HOST ? "local" : "server",
   };
 
+  let introHybrid = null;
+
   function showScreen(name) {
     const map = { intro: els.intro, survey: els.survey, results: els.results };
     for (const [key, el] of Object.entries(map)) {
@@ -124,11 +126,9 @@
       el.hidden = !active;
       el.classList.toggle("is-active", active);
     }
-    if (name === "intro") {
-      introHybrid.restart();
-    } else {
-      introHybrid.stop();
-    }
+    if (!introHybrid) return;
+    if (name === "intro") introHybrid.restart();
+    else introHybrid.stop();
   }
 
   function imageUrl(n, ext) {
@@ -905,7 +905,7 @@
     };
   }
 
-  const introHybrid = createIntroHybrid();
+  introHybrid = createIntroHybrid();
 
   function prefetchImages() {
     for (const slide of SLIDES) {

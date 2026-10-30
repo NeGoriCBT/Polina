@@ -210,8 +210,8 @@ button {
 .screen--survey {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
-  max-width: 1100px;
+  gap: 1.25rem;
+  max-width: 1280px;
   margin: 0 auto;
 }
 
@@ -770,7 +770,7 @@ button {
   align-self: stretch;
   display: grid;
   place-items: center;
-  width: clamp(2rem, 6vw, 3rem);
+  width: clamp(1.6rem, 4vw, 2.25rem);
   color: var(--fg);
   transition: opacity 0.15s ease, color 0.15s ease;
   user-select: none;
@@ -780,7 +780,7 @@ button {
 .feeling-arrow svg {
   display: block;
   width: 100%;
-  height: clamp(4.2rem, 14vw, 6.5rem);
+  height: clamp(2.8rem, 8vw, 4rem);
   stroke: currentColor;
   fill: none;
   stroke-width: 1.6;
@@ -801,6 +801,9 @@ button {
 
 .feeling-confirm {
   margin-top: 0;
+  min-width: 7rem;
+  padding: 0.7rem 1.25rem;
+  font-size: 0.82rem;
 }
 
 .visually-hidden {
@@ -951,10 +954,19 @@ button {
 
   .question-panel {
     min-height: 0;
+    max-width: none;
   }
 
   .picture-frame {
     max-width: none;
+  }
+
+  .question-text {
+    font-size: clamp(1.45rem, 5vw, 1.9rem);
+  }
+
+  .feeling-value {
+    font-size: clamp(1.85rem, 7vw, 2.5rem);
   }
 
   .stat-row {

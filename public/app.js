@@ -43,7 +43,6 @@
     answers: [],
     busy: false,
     storageMode: STATIC_HOST ? "local" : "server",
-    imageLoadId: 0,
   };
 
   function showScreen(name) {
@@ -60,20 +59,22 @@
   }
 
   function tryLoadImage(n, imgEl, placeholderEl, labelEl) {
-    const loadId = ++state.imageLoadId;
+    // Per-element generation so results-page loads don't cancel each other,
+    // while rapid slide changes still drop stale callbacks.
+    const loadId = (imgEl._treeLoadId = (imgEl._treeLoadId || 0) + 1);
     labelEl.textContent = `Стиль ${n}`;
     imgEl.hidden = true;
     placeholderEl.hidden = false;
 
     let i = 0;
     const tryNext = () => {
-      if (loadId !== state.imageLoadId) return;
+      if (loadId !== imgEl._treeLoadId) return;
       if (i >= EXT_CANDIDATES.length) return;
       const ext = EXT_CANDIDATES[i++];
       const url = imageUrl(n, ext);
 
       const onReady = () => {
-        if (loadId !== state.imageLoadId) return;
+        if (loadId !== imgEl._treeLoadId) return;
         imgEl.alt = `Стиль ${n}`;
         imgEl.hidden = false;
         placeholderEl.hidden = true;
@@ -82,7 +83,7 @@
       // Prefer assigning directly so the visible <img> participates in browser cache.
       imgEl.onload = onReady;
       imgEl.onerror = () => {
-        if (loadId !== state.imageLoadId) return;
+        if (loadId !== imgEl._treeLoadId) return;
         tryNext();
       };
       imgEl.src = url;

@@ -12,9 +12,9 @@ const DATA_DIR = path.join(ROOT, "data");
 const DATA_FILE = path.join(DATA_DIR, "submissions.json");
 // Static site lives at repo root (GitHub Pages + local npm start).
 
-const SLIDE_COUNT = 15;
+const SLIDE_COUNT = 16;
 
-/** Same feeling question for every image (tree-1 … tree-15). */
+/** Same feeling question for every image (tree-1 … tree-16). */
 const FEELING_OPTIONS = [
   "Вдохновение",
   "Радость",
@@ -42,6 +42,7 @@ const STYLES = [
   { name: "Сюрреализм", year: "~1924" },
   { name: "Активная живопись", year: "~1945" },
   { name: "Минимализм", year: "~1960" },
+  { name: "Поп-арт", year: "~1962" },
 ];
 const SLIDES = STYLES.map((style, i) => ({
   image: i + 1,
@@ -96,7 +97,7 @@ function appendSubmission(entry) {
 function isCompleteSubmission(sub) {
   return (
     sub &&
-    Number(sub.schema) === 6 &&
+    Number(sub.schema) === 7 &&
     Array.isArray(sub.answers) &&
     sub.answers.length === SLIDE_COUNT
   );
@@ -125,7 +126,7 @@ function aggregate(submissions) {
   }
 
   return {
-    schema: 6,
+    schema: 7,
     totalSubmissions: valid.length,
     slides: SLIDES,
     images,
@@ -220,7 +221,7 @@ const server = http.createServer(async (req, res) => {
       if (!clean) return send(res, 400, { error: "invalid submission" });
 
       const entry = {
-        schema: 6,
+        schema: 7,
         submittedAt: new Date().toISOString(),
         answers: clean.answers,
       };
@@ -256,6 +257,6 @@ const server = http.createServer(async (req, res) => {
 
 server.listen(PORT, "127.0.0.1", () => {
   console.log(`Опрос запущен: http://127.0.0.1:${PORT}`);
-  console.log(`Картинки: ${IMAGES} (tree-1.png … tree-15.png)`);
+  console.log(`Картинки: ${IMAGES} (tree-1.jpg … tree-16.jpg)`);
   console.log(`Данные:   ${DATA_FILE}`);
 });

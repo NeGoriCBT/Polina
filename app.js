@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  /** Same feeling question for every image (tree-1 … tree-15).
+  /** Same feeling question for every image (tree-1 … tree-16).
    *  Left = lighter/calmer → center Спокойствие → right = heavier/sadder. */
   const FEELING_OPTIONS = [
     "Вдохновение",
@@ -32,6 +32,7 @@
     { name: "Сюрреализм", year: "~1924", frame: "surreal" },
     { name: "Активная живопись", year: "~1945", frame: "action" },
     { name: "Минимализм", year: "~1960", frame: "minimal" },
+    { name: "Поп-арт", year: "~1962", frame: "pop" },
   ];
   const FRAME_TYPES = [
     "classic",
@@ -47,6 +48,7 @@
     "surreal",
     "action",
     "minimal",
+    "pop",
   ];
   const SLIDES = STYLES.map((style, i) => ({
     image: i + 1,
@@ -61,9 +63,9 @@
 
   const SLIDE_COUNT = SLIDES.length;
   const EXT_CANDIDATES = [".jpg", ".jpeg", ".webp", ".png"];
-  const STORAGE_KEY = "tree-survey-submissions-v7";
-  const LAST_KEY = "tree-survey-last-v7";
-  const SUBMISSION_SCHEMA = 6;
+  const STORAGE_KEY = "tree-survey-submissions-v8";
+  const LAST_KEY = "tree-survey-last-v8";
+  const SUBMISSION_SCHEMA = 7;
   /** Preloaded image URLs → HTMLImageElement (complete). */
   const imageCache = new Map();
 
@@ -294,8 +296,8 @@
       submittedAt: new Date().toISOString(),
       answers,
     };
-    // Path prefix submissions15slider/ — resets aggregates for the slider feeling set.
-    const url = `${remoteCfg.baseUrl.replace(/\/$/, "")}/${encodeURIComponent(remoteCfg.namespace)}/submissions15slider/${encodeURIComponent(id)}`;
+    // Path prefix submissions16/ — resets aggregates for the 16-image set.
+    const url = `${remoteCfg.baseUrl.replace(/\/$/, "")}/${encodeURIComponent(remoteCfg.namespace)}/submissions16/${encodeURIComponent(id)}`;
     const res = await fetch(url, {
       method: "POST",
       headers: {
@@ -318,7 +320,7 @@
     const entries = (data && data.entries) || {};
     const list = [];
     for (const [path, value] of Object.entries(entries)) {
-      if (!String(path).startsWith("submissions15slider/")) continue;
+      if (!String(path).startsWith("submissions16/")) continue;
       list.push(value);
     }
     return list;

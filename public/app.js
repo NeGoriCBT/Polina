@@ -124,6 +124,11 @@
       el.hidden = !active;
       el.classList.toggle("is-active", active);
     }
+    if (name === "intro") {
+      introHybrid.restart();
+    } else {
+      introHybrid.stop();
+    }
   }
 
   function imageUrl(n, ext) {
@@ -658,6 +663,250 @@
     return new Promise((r) => setTimeout(r, ms));
   }
 
+  /** Animated hybrid collage behind the intro (square trees, corner-locked crops). */
+  function createIntroHybrid() {
+    const board = document.getElementById("intro-hybrid-board");
+    const introInner = document.getElementById("intro-inner");
+    if (!board || !introInner) {
+      return { start() {}, stop() {}, restart() {} };
+    }
+
+    const CORNERS = [
+      { key: "tl", left: "0", top: "0" },
+      { key: "tr", left: "-100%", top: "0" },
+      { key: "bl", left: "0", top: "-100%" },
+      { key: "br", left: "-100%", top: "-100%" },
+    ];
+    const PAINTINGS = STYLES.map((s) => s.image);
+    const TREE_COUNT = 18;
+    const MAX_CONCURRENT_FADES = 3;
+    const EASE = "cubic-bezier(0.37, 0, 0.2, 1)";
+    const EXCLUDE_BY_CORNER = { bl: new Set([3]) }; // Рококо — не в нижнем левом углу
+    const REVEAL_TOTAL_MS = 2800;
+    const TEXT_DELAY_MS = 1000;
+
+    const slots = [];
+    const timers = new Set();
+    let activeFades = 0;
+    let changeQueue = [];
+    let running = false;
+    let morphing = false;
+
+    function rand(min, max) {
+      return min + Math.random() * (max - min);
+    }
+
+    function randInt(min, max) {
+      return Math.floor(rand(min, max + 1));
+    }
+
+    function later(fn, ms) {
+      const id = window.setTimeout(() => {
+        timers.delete(id);
+        if (!running) return;
+        fn();
+      }, ms);
+      timers.add(id);
+      return id;
+    }
+
+    function clearTimers() {
+      for (const id of timers) window.clearTimeout(id);
+      timers.clear();
+    }
+
+    function srcFor(index) {
+      return imageUrl(PAINTINGS[index], ".jpg");
+    }
+
+    function makeLayer(corner) {
+      const layer = document.createElement("div");
+      layer.className = "slot__layer";
+      const img = document.createElement("div");
+      img.className = "slot__img";
+      img.style.left = corner.left;
+      img.style.top = corner.top;
+      layer.appendChild(img);
+      return { layer, img };
+    }
+
+    function pickPainting(current, cornerKey) {
+      const banned = EXCLUDE_BY_CORNER[cornerKey] || null;
+      const allowed = [];
+      for (let i = 0; i < PAINTINGS.length; i += 1) {
+        if (banned && banned.has(PAINTINGS[i])) continue;
+        if (i === current) continue;
+        allowed.push(i);
+      }
+      if (!allowed.length) {
+        for (let i = 0; i < PAINTINGS.length; i += 1) {
+          if (banned && banned.has(PAINTINGS[i])) continue;
+          allowed.push(i);
+        }
+      }
+      return allowed[randInt(0, allowed.length - 1)];
+    }
+
+    function buildBoard() {
+      board.replaceChildren();
+      slots.length = 0;
+      for (let t = 0; t < TREE_COUNT; t += 1) {
+        const tree = document.createElement("div");
+        tree.className = "tree";
+        CORNERS.forEach((corner) => {
+          const el = document.createElement("div");
+          el.className = "slot";
+          const a = makeLayer(corner);
+          const b = makeLayer(corner);
+          el.append(a.layer, b.layer);
+          tree.appendChild(el);
+          slots.push({
+            el,
+            corner,
+            layers: [a, b],
+            active: 0,
+            painting: -1,
+            busy: false,
+          });
+        });
+        board.appendChild(tree);
+      }
+    }
+
+    function showFirstPainting(slot) {
+      const paintingIndex = pickPainting(-1, slot.corner.key);
+      slot.painting = paintingIndex;
+      const cur = slot.layers[slot.active];
+      cur.img.style.backgroundImage = `url("${srcFor(paintingIndex)}")`;
+      cur.layer.style.transition = "none";
+      cur.layer.classList.add("is-on");
+      void cur.layer.offsetWidth;
+      cur.layer.style.transition = "";
+    }
+
+    function crossfadePainting(slot, paintingIndex, fadeMs) {
+      slot.painting = paintingIndex;
+      const url = srcFor(paintingIndex);
+      const from = slot.layers[slot.active];
+      const toIndex = 1 - slot.active;
+      const to = slot.layers[toIndex];
+
+      to.img.style.backgroundImage = `url("${url}")`;
+      to.layer.style.transition = "none";
+      to.layer.classList.remove("is-on");
+      void to.layer.offsetWidth;
+
+      const ms = `${fadeMs}ms`;
+      to.layer.style.transition = `opacity ${ms} ${EASE}`;
+      from.layer.style.transition = `opacity ${ms} ${EASE}`;
+      to.layer.style.zIndex = "1";
+      from.layer.style.zIndex = "2";
+      to.layer.classList.add("is-on");
+      from.layer.classList.remove("is-on");
+      slot.active = toIndex;
+
+      later(() => {
+        from.layer.style.zIndex = "";
+        to.layer.style.zIndex = "1";
+      }, fadeMs);
+    }
+
+    function scheduleNextChange(slot) {
+      later(() => enqueueChange(slot), rand(7000, 16000));
+    }
+
+    function pumpQueue() {
+      if (!morphing) return;
+      while (activeFades < MAX_CONCURRENT_FADES && changeQueue.length) {
+        runChange(changeQueue.shift());
+      }
+    }
+
+    function enqueueChange(slot) {
+      if (!morphing) return;
+      if (slot.busy) {
+        scheduleNextChange(slot);
+        return;
+      }
+      changeQueue.push(slot);
+      pumpQueue();
+    }
+
+    function runChange(slot) {
+      slot.busy = true;
+      activeFades += 1;
+      const next = pickPainting(slot.painting, slot.corner.key);
+      const fadeMs = rand(2800, 4800);
+      crossfadePainting(slot, next, fadeMs);
+      later(() => {
+        activeFades = Math.max(0, activeFades - 1);
+        slot.busy = false;
+        pumpQueue();
+        if (morphing) scheduleNextChange(slot);
+      }, fadeMs);
+    }
+
+    function startMorphEngine() {
+      morphing = true;
+      slots.forEach((slot) => {
+        later(() => enqueueChange(slot), rand(400, 9000));
+      });
+    }
+
+    function start() {
+      stop();
+      running = true;
+      morphing = false;
+      activeFades = 0;
+      changeQueue = [];
+      introInner.classList.remove("is-ready");
+      buildBoard();
+
+      const revealOrder = slots.slice();
+      for (let i = revealOrder.length - 1; i > 0; i -= 1) {
+        const j = randInt(0, i);
+        const tmp = revealOrder[i];
+        revealOrder[i] = revealOrder[j];
+        revealOrder[j] = tmp;
+      }
+
+      const n = revealOrder.length;
+      const step = n <= 1 ? 0 : REVEAL_TOTAL_MS / (n - 1);
+      let lastRevealAt = 0;
+
+      revealOrder.forEach((slot, i) => {
+        const delay = step * i;
+        lastRevealAt = delay;
+        later(() => {
+          slot.el.classList.add("is-ready");
+          showFirstPainting(slot);
+        }, delay);
+      });
+
+      later(() => {
+        introInner.classList.add("is-ready");
+        startMorphEngine();
+      }, lastRevealAt + TEXT_DELAY_MS);
+    }
+
+    function stop() {
+      running = false;
+      morphing = false;
+      clearTimers();
+      activeFades = 0;
+      changeQueue = [];
+      introInner.classList.remove("is-ready");
+    }
+
+    return {
+      start,
+      stop,
+      restart: start,
+    };
+  }
+
+  const introHybrid = createIntroHybrid();
+
   function prefetchImages() {
     for (const slide of SLIDES) {
       const n = slide.image;
@@ -717,13 +966,9 @@
   els.btnAgain.addEventListener("click", () => {
     resetSurvey();
     showScreen("intro");
-    for (const line of els.intro.querySelectorAll(".fade-line")) {
-      line.style.animation = "none";
-      void line.offsetWidth;
-      line.style.animation = "";
-    }
   });
 
   renderFeelingList();
   prefetchImages();
+  introHybrid.start();
 })();

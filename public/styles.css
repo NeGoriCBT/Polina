@@ -56,33 +56,70 @@ button {
   background: #000;
 }
 
-.intro-collage {
+.hybrid-board {
+  --cols: 6;
+  --rows: 3;
+  --gap: 3px;
+  --board-w: max(100vw, calc(100dvh * var(--cols) / var(--rows)));
+  --board-h: calc(var(--board-w) * var(--rows) / var(--cols));
   position: absolute;
-  inset: 0;
+  top: 50%;
+  left: 50%;
+  width: var(--board-w);
+  height: var(--board-h);
+  transform: translate(-50%, -50%);
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  grid-template-rows: repeat(3, 1fr);
-  gap: 3px;
+  grid-template-columns: repeat(var(--cols), 1fr);
+  grid-template-rows: repeat(var(--rows), 1fr);
+  gap: var(--gap);
   background: #000;
 }
 
-.intro-collage img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  opacity: 0;
-  transform: scale(1.06);
-  animation: collage-tile 0.9s ease forwards;
-  animation-delay: calc(var(--i, 0) * 0.045s + 0.05s);
-  filter: grayscale(0.15) contrast(1.05);
+.hybrid-board .tree {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 2px;
+  background: #000;
 }
 
-@keyframes collage-tile {
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+.hybrid-board .slot {
+  position: relative;
+  overflow: hidden;
+  background: #111;
+  opacity: 0;
+  transition: opacity 0.9s cubic-bezier(0.33, 0, 0.2, 1);
+}
+
+.hybrid-board .slot.is-ready {
+  opacity: 1;
+}
+
+.hybrid-board .slot__layer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  opacity: 0;
+  will-change: opacity;
+  transition: opacity 3.2s cubic-bezier(0.37, 0, 0.2, 1);
+}
+
+.hybrid-board .slot__layer.is-on {
+  opacity: 1;
+}
+
+.hybrid-board .slot__img {
+  position: absolute;
+  width: 200%;
+  height: 200%;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  left: 0;
+  top: 0;
+  filter: grayscale(0.15) contrast(1.05);
 }
 
 .intro-veil {
@@ -139,8 +176,11 @@ button {
 .fade-line {
   opacity: 0;
   transform: translateY(0.6rem);
+}
+
+.intro-inner.is-ready .fade-line {
   animation: rise-in 1.1s ease forwards;
-  animation-delay: calc(var(--d, 0) * 0.35s + 0.55s);
+  animation-delay: calc(var(--d, 0) * 0.35s);
 }
 
 @keyframes rise-in {
@@ -155,9 +195,9 @@ button {
 }
 
 @media (max-width: 720px) {
-  .intro-collage {
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(6, 1fr);
+  .hybrid-board {
+    --cols: 3;
+    --rows: 6;
   }
 }
 
@@ -244,7 +284,7 @@ button {
 .survey-layout {
   display: grid;
   grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.75fr);
-  gap: clamp(1.5rem, 4vw, 2.5rem);
+  gap: clamp(1.75rem, 4vw, 2.75rem);
   align-items: center;
   flex: 1;
 }
@@ -666,17 +706,18 @@ button {
 .feeling-list {
   display: none;
   flex-direction: column;
-  gap: 0;
-  border-top: 1px solid var(--line);
+  gap: 0.15rem;
   margin-bottom: 0.25rem;
+  border: none;
 }
 
 .feeling-option {
   display: block;
   width: 100%;
   text-align: left;
-  padding: 0.62rem 0.15rem;
-  border-bottom: 1px solid var(--line);
+  padding: 0.55rem 0.15rem;
+  border: none;
+  border-bottom: none;
   font-size: 0.95rem;
   color: #d0d0d0;
   transition: color 0.15s ease, padding-left 0.15s ease, background 0.15s ease;
@@ -979,6 +1020,10 @@ button {
 }
 
 @media (min-width: 761px) {
+  .survey-layout {
+    column-gap: clamp(2rem, 4.5vw, 3rem);
+  }
+
   .feeling-list {
     display: flex;
   }
@@ -989,7 +1034,19 @@ button {
   }
 
   .question-panel {
+    position: relative;
     max-width: 20rem;
+    padding-left: clamp(1.25rem, 2.5vw, 1.75rem);
+  }
+
+  .question-panel::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: var(--line);
   }
 }
 

@@ -1,0 +1,255 @@
+"use strict";
+
+const http = require("http");
+const fs = require("fs");
+const path = require("path");
+const { URL } = require("url");
+
+const PORT = Number(process.env.PORT) || 3847;
+const ROOT = __dirname;
+const PUBLIC = path.join(ROOT, "public");
+const IMAGES = path.join(ROOT, "images");
+const DATA_DIR = path.join(ROOT, "data");
+const DATA_FILE = path.join(DATA_DIR, "submissions.json");
+
+const SLIDE_COUNT = 7;
+
+/** One question per image (order = tree-1 … tree-7). */
+const SLIDES = [
+  {
+    image: 1,
+    id: "feeling",
+    text: "Что вы чувствуете в первую очередь?",
+    options: ["спокойствие", "тревогу", "радость", "грусть", "ничего особенного"],
+  },
+  {
+    image: 2,
+    id: "mood",
+    text: "Какое настроение у картинки?",
+    options: ["тёплое", "холодное", "нейтральное"],
+  },
+  {
+    image: 3,
+    id: "like",
+    text: "Насколько она вам нравится?",
+    options: ["очень", "скорее да", "скорее нет", "совсем нет"],
+  },
+  {
+    image: 4,
+    id: "alive",
+    text: "Кажется ли дерево живым?",
+    options: ["да", "скорее да", "скорее нет", "нет"],
+  },
+  {
+    image: 5,
+    id: "place",
+    text: "Где бы вы её представили?",
+    options: ["дома", "в музее", "в книге", "нигде"],
+  },
+  {
+    image: 6,
+    id: "tone",
+    text: "Эта картина скорее…",
+    options: ["мечта", "кошмар", "обычный день", "сказка"],
+  },
+  {
+    image: 7,
+    id: "beside",
+    text: "Хотели бы вы оказаться рядом с этим деревом?",
+    options: ["да", "скорее да", "скорее нет", "нет"],
+  },
+];
+
+const MIME = {
+  ".html": "text/html; charset=utf-8",
+  ".css": "text/css; charset=utf-8",
+  ".js": "application/javascript; charset=utf-8",
+  ".json": "application/json; charset=utf-8",
+  ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg",
+  ".png": "image/png",
+  ".webp": "image/webp",
+  ".gif": "image/gif",
+  ".svg": "image/svg+xml",
+  ".ico": "image/x-icon",
+};
+
+function ensureDataFile() {
+  if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+  if (!fs.existsSync(DATA_FILE)) {
+    fs.writeFileSync(DATA_FILE, "[]\n", "utf8");
+  }
+}
+
+function readSubmissions() {
+  ensureDataFile();
+  try {
+    const raw = fs.readFileSync(DATA_FILE, "utf8").trim() || "[]";
+    const data = JSON.parse(raw);
+    return Array.isArray(data) ? data : [];
+  } catch {
+    return [];
+  }
+}
+
+function appendSubmission(entry) {
+  ensureDataFile();
+  const list = readSubmissions();
+  list.push(entry);
+  fs.writeFileSync(DATA_FILE, JSON.stringify(list, null, 2) + "\n", "utf8");
+  return list.length;
+}
+
+function aggregate(submissions) {
+  const images = SLIDES.map((slide) => ({
+    image: slide.image,
+    label: `Стиль ${slide.image}`,
+    question: { id: slide.id, text: slide.text, options: slide.options },
+    counts: Object.fromEntries(slide.options.map((o) => [o, 0])),
+  }));
+
+  for (const sub of submissions) {
+    if (!sub || !Array.isArray(sub.answers)) continue;
+    // Schema v2: [{ image, id, value }]
+    for (const row of sub.answers) {
+      const idx = Number(row.image) - 1;
+      if (idx < 0 || idx >= SLIDE_COUNT) continue;
+      const slide = SLIDES[idx];
+      if (row.id !== slide.id) continue;
+      const val = row.value;
+      if (typeof val === "string" && Object.prototype.hasOwnProperty.call(images[idx].counts, val)) {
+        images[idx].counts[val] += 1;
+      }
+    }
+  }
+
+  return {
+    schema: 2,
+    totalSubmissions: submissions.length,
+    slides: SLIDES,
+    images,
+  };
+}
+
+function send(res, status, body, headers = {}) {
+  const payload = typeof body === "string" ? body : JSON.stringify(body);
+  res.writeHead(status, {
+    "Content-Type": headers["Content-Type"] || "application/json; charset=utf-8",
+    "Cache-Control": "no-store",
+    ...headers,
+  });
+  res.end(payload);
+}
+
+function safeJoin(base, reqPath) {
+  const decoded = decodeURIComponent(reqPath.split("?")[0]);
+  const cleaned = path.normalize(decoded).replace(/^(\.\.[/\\])+/, "");
+  const full = path.join(base, cleaned);
+  if (!full.startsWith(base)) return null;
+  return full;
+}
+
+function serveFile(res, filePath) {
+  if (!filePath || !fs.existsSync(filePath) || fs.statSync(filePath).isDirectory()) {
+    send(res, 404, { error: "not found" });
+    return;
+  }
+  const ext = path.extname(filePath).toLowerCase();
+  const type = MIME[ext] || "application/octet-stream";
+  res.writeHead(200, { "Content-Type": type, "Cache-Control": "no-cache" });
+  fs.createReadStream(filePath).pipe(res);
+}
+
+function readBody(req) {
+  return new Promise((resolve, reject) => {
+    const chunks = [];
+    let size = 0;
+    req.on("data", (chunk) => {
+      size += chunk.length;
+      if (size > 200_000) {
+        reject(new Error("body too large"));
+        req.destroy();
+        return;
+      }
+      chunks.push(chunk);
+    });
+    req.on("end", () => resolve(Buffer.concat(chunks).toString("utf8")));
+    req.on("error", reject);
+  });
+}
+
+function validateSubmission(payload) {
+  if (!payload || typeof payload !== "object") return null;
+  if (!Array.isArray(payload.answers) || payload.answers.length !== SLIDE_COUNT) return null;
+
+  const answers = [];
+  for (let i = 0; i < SLIDE_COUNT; i++) {
+    const slide = SLIDES[i];
+    const row = payload.answers[i];
+    if (!row || Number(row.image) !== slide.image) return null;
+    if (row.id !== slide.id) return null;
+    const val = row.value;
+    if (typeof val !== "string" || !slide.options.includes(val)) return null;
+    answers.push({ image: slide.image, id: slide.id, value: val });
+  }
+  return { answers };
+}
+
+ensureDataFile();
+
+const server = http.createServer(async (req, res) => {
+  const url = new URL(req.url || "/", `http://${req.headers.host || "localhost"}`);
+  const pathname = url.pathname;
+
+  try {
+    if (req.method === "GET" && pathname === "/api/stats") {
+      const stats = aggregate(readSubmissions());
+      return send(res, 200, stats);
+    }
+
+    if (req.method === "POST" && pathname === "/api/submit") {
+      const raw = await readBody(req);
+      let parsed;
+      try {
+        parsed = JSON.parse(raw || "{}");
+      } catch {
+        return send(res, 400, { error: "invalid json" });
+      }
+      const clean = validateSubmission(parsed);
+      if (!clean) return send(res, 400, { error: "invalid submission" });
+
+      const entry = {
+        schema: 2,
+        submittedAt: new Date().toISOString(),
+        answers: clean.answers,
+      };
+      const total = appendSubmission(entry);
+      return send(res, 200, { ok: true, totalSubmissions: total });
+    }
+
+    if (req.method === "GET" && (pathname === "/" || pathname === "/index.html")) {
+      return serveFile(res, path.join(PUBLIC, "index.html"));
+    }
+
+    if (req.method === "GET" && pathname.startsWith("/images/")) {
+      const file = safeJoin(IMAGES, pathname.slice("/images/".length));
+      return serveFile(res, file);
+    }
+
+    if (req.method === "GET") {
+      const file = safeJoin(PUBLIC, pathname);
+      return serveFile(res, file);
+    }
+
+    send(res, 405, { error: "method not allowed" });
+  } catch (err) {
+    console.error(err);
+    send(res, 500, { error: "server error" });
+  }
+});
+
+server.listen(PORT, "127.0.0.1", () => {
+  console.log(`Опрос запущен: http://127.0.0.1:${PORT}`);
+  console.log(`Картинки: ${IMAGES} (tree-1.png … tree-7.png)`);
+  console.log(`Данные:   ${DATA_FILE}`);
+});

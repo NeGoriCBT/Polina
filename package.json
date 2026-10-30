@@ -1,0 +1,13 @@
+{
+  "name": "tree-perception-survey",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Школьный опрос: восприятие дерева в разных стилях",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

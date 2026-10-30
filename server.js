@@ -14,51 +14,14 @@ const DATA_FILE = path.join(DATA_DIR, "submissions.json");
 
 const SLIDE_COUNT = 7;
 
-/** One question per image (order = tree-1 … tree-7). */
-const SLIDES = [
-  {
-    image: 1,
-    id: "feeling",
-    text: "Что вы чувствуете в первую очередь?",
-    options: ["спокойствие", "тревогу", "радость", "грусть", "ничего особенного"],
-  },
-  {
-    image: 2,
-    id: "mood",
-    text: "Какое настроение у картинки?",
-    options: ["тёплое", "холодное", "нейтральное"],
-  },
-  {
-    image: 3,
-    id: "like",
-    text: "Насколько она вам нравится?",
-    options: ["очень", "скорее да", "скорее нет", "совсем нет"],
-  },
-  {
-    image: 4,
-    id: "alive",
-    text: "Кажется ли дерево живым?",
-    options: ["да", "скорее да", "скорее нет", "нет"],
-  },
-  {
-    image: 5,
-    id: "place",
-    text: "Где бы вы её представили?",
-    options: ["дома", "в музее", "в книге", "нигде"],
-  },
-  {
-    image: 6,
-    id: "tone",
-    text: "Эта картина скорее…",
-    options: ["мечта", "кошмар", "обычный день", "сказка"],
-  },
-  {
-    image: 7,
-    id: "beside",
-    text: "Хотели бы вы оказаться рядом с этим деревом?",
-    options: ["да", "скорее да", "скорее нет", "нет"],
-  },
-];
+/** Same feeling question for every image (tree-1 … tree-7). */
+const FEELING_OPTIONS = ["спокойствие", "тревогу", "радость", "грусть", "ничего особенного"];
+const SLIDES = [1, 2, 3, 4, 5, 6, 7].map((image) => ({
+  image,
+  id: "feeling",
+  text: "Что вы чувствуете в первую очередь?",
+  options: FEELING_OPTIONS,
+}));
 
 const MIME = {
   ".html": "text/html; charset=utf-8",

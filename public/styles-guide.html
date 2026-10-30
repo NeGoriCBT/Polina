@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Стили · Дерево в разных стилях</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css?v=31" />
+</head>
+<body class="guide-page">
+  <header class="guide-top">
+    <a class="guide-back" href="index.html">← К опросу</a>
+    <p class="guide-kicker">справочник</p>
+    <h1 class="guide-title">Восемнадцать стилей</h1>
+    <p class="guide-lead">
+      Коротко о каждом направлении: когда оно появилось, чем отличалось
+      и какое чувство часто оставляет дерево в этом языке.
+    </p>
+  </header>
+
+  <nav class="guide-nav" id="guide-nav" aria-label="Стили"></nav>
+  <main class="guide-list" id="guide-list"></main>
+
+  <footer class="guide-foot">
+    <a class="btn" href="index.html">Пройти опрос</a>
+  </footer>
+
+  <script>
+    const STYLES = [
+      {
+        name: "Ренессанс",
+        year: "~1400",
+        image: 1,
+        frame: "classic",
+        text: "Эпоха возрождения интереса к человеку, природе и гармонии. Художники искали ясность, равновесие и «правильное» построение мира. Дерево здесь часто кажется спокойным и цельным — будто стоит в ясном свете.",
+      },
+      {
+        name: "Барокко",
+        year: "~1600",
+        image: 2,
+        frame: "baroque",
+        text: "Стиль большого жеста: контрасты света и тени, движение, пышность. Искусство хотело впечатлять и вовлекать. Дерево в барокко может ощущаться торжественным, почти театральным.",
+      },
+      {
+        name: "Рококо",
+        year: "~1730",
+        image: 3,
+        frame: "rococo",
+        text: "Лёгкость, изящество, декоративность. После тяжёлого барокко рококо стало воздушнее и капризнее. Дерево здесь часто выглядит мягче, с игривым, почти сказочным настроением.",
+      },
+      {
+        name: "Классицизм",
+        year: "~1750",
+        image: 4,
+        frame: "classicist",
+        text: "Возврат к порядку, мере и античным образцам. Важны ясная структура и сдержанная красота. Дерево в классицизме обычно читается собранно, спокойно и «правильно».",
+      },
+      {
+        name: "Романтизм",
+        year: "~1820",
+        image: 17,
+        frame: "romantic",
+        text: "Чувство важнее правила. Романтики любили природу как зеркало души: ветер, даль, тайну. Дерево здесь может казаться одиноким, живым и чуть меланхоличным.",
+      },
+      {
+        name: "Импрессионизм",
+        year: "~1874",
+        image: 5,
+        frame: "impression",
+        text: "Живопись мгновения: свет, воздух, цвет меняются на глазах. Художники писали впечатление, а не детальный «отчёт». Дерево мерцает, будто поймано в одном дыхании дня.",
+      },
+      {
+        name: "Фовизм",
+        year: "~1905",
+        image: 6,
+        frame: "darkwood",
+        text: "«Дикие» чистые цвета и смелые пятна. Форма упрощается, эмоция усиливается через краску. Дерево может вспыхнуть неожиданным цветом и дать ощущение энергии.",
+      },
+      {
+        name: "Экспрессионизм",
+        year: "~1905",
+        image: 7,
+        frame: "darkwood",
+        text: "Искажение ради чувства. Мир показывают не таким, каким он «есть», а таким, каким он переживается. Дерево здесь часто тревожнее, резче, внутренне напряжённее.",
+      },
+      {
+        name: "Кубизм",
+        year: "~1907",
+        image: 8,
+        frame: "black",
+        text: "Предмет разбирают на грани и показывают сразу с разных сторон. Привычный вид ломается, чтобы увидеть структуру. Дерево становится сборкой плоскостей — знакомое и странное одновременно.",
+      },
+      {
+        name: "Авангардизм",
+        year: "~1910",
+        image: 9,
+        frame: "black",
+        text: "Общее имя для смелых поисков начала XX века: отказ от старых правил, эксперимент, новый язык. Дерево здесь может выглядеть как вызов привычному взгляду.",
+      },
+      {
+        name: "Абстракционизм",
+        year: "~1910",
+        image: 10,
+        frame: "gallery",
+        text: "Отход от узнаваемой натуры к цвету, ритму и форме. Важно не «что нарисовано», а как это действует на зрителя. Дерево может раствориться в пятнах и линиях, оставив ощущение.",
+      },
+      {
+        name: "Супрематизм",
+        year: "~1915",
+        image: 11,
+        frame: "suprematist",
+        text: "Крайняя ясность простых фигур и чистых отношений. Малевич и круг супрематистов искали «чистую» живопись. Дерево здесь сводится к знаку — почти формуле.",
+      },
+      {
+        name: "Дадаизм",
+        year: "~1916",
+        image: 12,
+        frame: "dada",
+        text: "Искусство после войны, полное сомнения и иронии. Случайность, коллаж, отказ от «красивого смысла». Дерево может выглядеть странно собранным — как будто мир слегка сбит с толку.",
+      },
+      {
+        name: "Сюрреализм",
+        year: "~1924",
+        image: 13,
+        frame: "surreal",
+        text: "Сон наяву: неожиданные соединения образов, логика бессознательного. Знакомое становится загадочным. Дерево может стоять в мире, где обычные правила не работают.",
+      },
+      {
+        name: "Активная живопись",
+        year: "~1945",
+        image: 14,
+        frame: "action",
+        text: "Жест, движение, след руки на холсте. Важен сам процесс письма. Дерево здесь скорее вспышка энергии, чем спокойный портрет природы.",
+      },
+      {
+        name: "Минимализм",
+        year: "~1960",
+        image: 15,
+        frame: "minimal",
+        text: "Меньше деталей — сильнее суть. Убирают лишнее, оставляют ясность. Дерево может стать почти тихим знаком: мало форм, много воздуха.",
+      },
+      {
+        name: "Поп-арт",
+        year: "~1962",
+        image: 16,
+        frame: "pop",
+        text: "Язык рекламы, комиксов и массовой культуры. Ярко, плоско, узнаваемо. Дерево может выглядеть «как на постере» — громко и по-современному.",
+      },
+      {
+        name: "Постмодернизм",
+        year: "~1980",
+        image: 18,
+        frame: "postmodern",
+        text: "Игра цитатами, смешение языков, сомнение в одном «правильном» стиле. Можно соединять эпохи. Дерево здесь часто кажется собранным из разных времён сразу.",
+      },
+    ];
+
+    const nav = document.getElementById("guide-nav");
+    const list = document.getElementById("guide-list");
+
+    STYLES.forEach((style, i) => {
+      const id = `style-${style.image}`;
+
+      const chip = document.createElement("a");
+      chip.className = "guide-chip";
+      chip.href = `#${id}`;
+      chip.textContent = style.name;
+      nav.appendChild(chip);
+
+      const article = document.createElement("article");
+      article.className = "guide-card";
+      article.id = id;
+      article.style.setProperty("--i", String(i));
+      article.innerHTML = `
+        <figure class="picture-frame picture-frame--${style.frame} picture-frame--compact guide-frame">
+          <div class="picture-frame__moulding">
+            <div class="picture-frame__lip">
+              <div class="picture-frame__matte">
+                <div class="picture-frame__glass">
+                  <img src="images/tree-${style.image}.jpg" alt="${style.name}" loading="lazy" decoding="async" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </figure>
+        <div class="guide-copy">
+          <header class="guide-card-head">
+            <h2 class="guide-card-title">${style.name}</h2>
+            <span class="guide-card-year">${style.year}</span>
+          </header>
+          <p class="guide-card-text">${style.text}</p>
+        </div>
+      `;
+      list.appendChild(article);
+    });
+  </script>
+</body>
+</html>

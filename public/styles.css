@@ -592,38 +592,48 @@ button {
   box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
 }
 
-/* Postmodern — ironic mix of chrome, mint, pink */
+/* Postmodern — classical gold moulding painted matte black + neon accent */
 .picture-frame--postmodern {
-  padding: 0.5rem;
-  background:
-    linear-gradient(180deg, #f2f2f2 0%, #c8c8c8 40%, #8a8a8a 100%);
+  padding: 0.85rem;
+  background: linear-gradient(145deg, #2e2e2e 0%, #121212 45%, #050505 100%);
   box-shadow:
-    0 12px 32px rgba(0, 0, 0, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.7),
-    inset 0 -2px 4px rgba(0, 0, 0, 0.15);
+    0 16px 40px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -2px 6px rgba(0, 0, 0, 0.5);
 }
 .picture-frame--postmodern .picture-frame__moulding {
-  padding: 0.28rem;
-  background: linear-gradient(90deg, #7fffd4 0%, #ff7eb9 50%, #7ec8ff 100%);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+  padding: 0.65rem;
+  background: linear-gradient(
+    160deg,
+    #5a5a5a 0%,
+    #2a2a2a 25%,
+    #0e0e0e 55%,
+    #3a3a3a 80%,
+    #6a6a6a 100%
+  );
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.12),
+    inset 0 0 0 3px rgba(0, 0, 0, 0.55),
+    inset 0 2px 4px rgba(255, 255, 255, 0.08);
 }
 .picture-frame--postmodern .picture-frame__lip {
-  padding: 0.18rem;
-  background: linear-gradient(180deg, #e8e8e8, #2a2a2a);
+  padding: 0.22rem;
+  background: linear-gradient(90deg, #39ff14 0%, #00e5ff 50%, #ff2bd6 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
 }
 .picture-frame--postmodern .picture-frame__matte {
-  padding: 0.45rem;
-  background: #fafafa;
-  box-shadow: inset 0 0 0 1px #ddd;
+  padding: 0.55rem;
+  background: linear-gradient(180deg, #1a1a1a, #0a0a0a);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
 }
 .picture-frame--postmodern .picture-frame__glass::after {
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.22) 0%,
-    rgba(255, 255, 255, 0.05) 20%,
-    rgba(0, 0, 0, 0) 45%,
-    rgba(0, 0, 0, 0.2) 75%,
-    rgba(0, 0, 0, 0.4) 100%
+    rgba(255, 255, 255, 0.14) 0%,
+    rgba(255, 255, 255, 0.04) 18%,
+    rgba(0, 0, 0, 0) 42%,
+    rgba(0, 0, 0, 0.28) 75%,
+    rgba(0, 0, 0, 0.5) 100%
   );
 }
 

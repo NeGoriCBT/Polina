@@ -70,7 +70,14 @@
   const EXT_CANDIDATES = [".jpg", ".jpeg", ".webp", ".png"];
   const STORAGE_KEY = "tree-survey-submissions-v9";
   const LAST_KEY = "tree-survey-last-v9";
+  const MY_TREE_KEY = "tree-survey-my-tree-v1";
   const SUBMISSION_SCHEMA = 8;
+  const REWARD_CORNERS = [
+    { key: "tl", left: "0", top: "0" },
+    { key: "tr", left: "-100%", top: "0" },
+    { key: "bl", left: "0", top: "-100%" },
+    { key: "br", left: "-100%", top: "-100%" },
+  ];
   /** Preloaded image URLs → HTMLImageElement (complete). */
   const imageCache = new Map();
 
@@ -87,10 +94,17 @@
   const els = {
     intro: document.getElementById("screen-intro"),
     survey: document.getElementById("screen-survey"),
+    reward: document.getElementById("screen-reward"),
     results: document.getElementById("screen-results"),
     btnStart: document.getElementById("btn-start"),
     btnResults: document.getElementById("btn-results"),
-    btnAgain: document.getElementById("btn-again"),
+    btnClaimTree: document.getElementById("btn-claim-tree"),
+    btnDownloadTree: document.getElementById("btn-download-tree"),
+    btnRewardResults: document.getElementById("btn-reward-results"),
+    rewardLead: document.getElementById("reward-lead"),
+    rewardFrame: document.getElementById("reward-frame"),
+    rewardTree: document.getElementById("reward-tree"),
+    rewardCaption: document.getElementById("reward-caption"),
     styleName: document.getElementById("style-name"),
     styleYear: document.getElementById("style-year"),
     surveyImage: document.getElementById("survey-image"),
@@ -115,13 +129,22 @@
     answers: [],
     busy: false,
     storageMode: HAS_REMOTE ? "remote" : STATIC_HOST ? "local" : "server",
+    pendingResultsAnswers: null,
+    rewardParts: null,
+    rewardTimers: new Set(),
   };
 
   let introHybrid = null;
 
   function showScreen(name) {
-    const map = { intro: els.intro, survey: els.survey, results: els.results };
+    const map = {
+      intro: els.intro,
+      survey: els.survey,
+      reward: els.reward,
+      results: els.results,
+    };
     for (const [key, el] of Object.entries(map)) {
+      if (!el) continue;
       const active = key === name;
       el.hidden = !active;
       el.classList.toggle("is-active", active);
@@ -527,6 +550,350 @@
     await finishSurvey();
   }
 
+  function clearRewardTimers() {
+    for (const id of state.rewardTimers) window.clearTimeout(id);
+    state.rewardTimers.clear();
+  }
+
+  function rewardLater(fn, ms) {
+    const id = window.setTimeout(() => {
+      state.rewardTimers.delete(id);
+      fn();
+    }, ms);
+    state.rewardTimers.add(id);
+    return id;
+  }
+
+  function readMyTree() {
+    try {
+      const raw = localStorage.getItem(MY_TREE_KEY);
+      if (!raw) return null;
+      const data = JSON.parse(raw);
+      if (!data || !Array.isArray(data.parts) || data.parts.length !== 4) return null;
+      return data;
+    } catch {
+      return null;
+    }
+  }
+
+  function writeMyTree(parts) {
+    localStorage.setItem(
+      MY_TREE_KEY,
+      JSON.stringify({
+        parts: parts.map((p) => ({
+          image: p.image,
+          name: p.name,
+          frame: p.frame,
+        })),
+        at: Date.now(),
+      })
+    );
+  }
+
+  function styleMetaByImage(image) {
+    const style = STYLES.find((s) => s.image === image);
+    return {
+      image,
+      name: style ? style.name : `Стиль ${image}`,
+      frame: style ? style.frame : "classic",
+    };
+  }
+
+  /** Build 4 unique corner styles from answers (stronger feelings first). */
+  function buildTreePartsFromAnswers(answers) {
+    const ranked = (answers || [])
+      .map((row, i) => {
+        const feelingIndex = FEELING_OPTIONS.indexOf(row.value);
+        const intensity = feelingIndex < 0 ? 0 : Math.abs(feelingIndex - FEELING_MID);
+        return { image: row.image, intensity, order: i };
+      })
+      .sort((a, b) => b.intensity - a.intensity || a.order - b.order);
+
+    const picked = [];
+    const used = new Set();
+
+    function tryAdd(image, cornerKey) {
+      if (used.has(image)) return false;
+      if (cornerKey === "bl" && image === 3) return false; // Рококо не в нижнем левом
+      used.add(image);
+      picked.push(styleMetaByImage(image));
+      return true;
+    }
+
+    for (const row of ranked) {
+      if (picked.length >= 4) break;
+      const cornerKey = REWARD_CORNERS[picked.length].key;
+      tryAdd(row.image, cornerKey);
+    }
+
+    for (const style of STYLES) {
+      if (picked.length >= 4) break;
+      const cornerKey = REWARD_CORNERS[picked.length].key;
+      tryAdd(style.image, cornerKey);
+    }
+
+    // Last-resort fill if rococo ban blocked everything.
+    for (const style of STYLES) {
+      if (picked.length >= 4) break;
+      if (used.has(style.image)) continue;
+      used.add(style.image);
+      picked.push(styleMetaByImage(style.image));
+    }
+
+    return picked.slice(0, 4);
+  }
+
+  function setRewardFrameType(type) {
+    if (!els.rewardFrame) return;
+    for (const t of FRAME_TYPES) {
+      els.rewardFrame.classList.toggle(`picture-frame--${t}`, t === type);
+    }
+    if (!FRAME_TYPES.includes(type)) {
+      els.rewardFrame.classList.add("picture-frame--classic");
+    }
+  }
+
+  function paintRewardTree(parts, { animate }) {
+    if (!els.rewardTree || !els.rewardFrame) return;
+    clearRewardTimers();
+    els.rewardTree.replaceChildren();
+    els.rewardCaption.classList.remove("is-on");
+    els.rewardCaption.textContent = "";
+    els.rewardFrame.hidden = false;
+    els.rewardFrame.classList.remove("is-entering");
+    void els.rewardFrame.offsetWidth;
+    els.rewardFrame.classList.add("is-entering");
+    setRewardFrameType(parts[0].frame);
+
+    const slots = [];
+    parts.forEach((part, i) => {
+      const corner = REWARD_CORNERS[i];
+      const slot = document.createElement("div");
+      slot.className = animate ? "slot" : "slot is-ready";
+      const img = document.createElement("div");
+      img.className = "slot__img";
+      img.style.left = corner.left;
+      img.style.top = corner.top;
+      img.style.backgroundImage = `url("${imageUrl(part.image, ".jpg")}")`;
+      slot.appendChild(img);
+      els.rewardTree.appendChild(slot);
+      slots.push(slot);
+    });
+
+    const finishCaption = (suffix) => {
+      els.rewardCaption.textContent =
+        parts.map((p) => p.name).join(" · ") + (suffix || "");
+      els.rewardCaption.classList.add("is-on");
+      if (els.btnDownloadTree) els.btnDownloadTree.hidden = false;
+    };
+
+    if (!animate) {
+      finishCaption(" · уже получено");
+      return;
+    }
+
+    slots.forEach((slot, step) => {
+      rewardLater(() => slot.classList.add("is-ready"), 420 + step * 380);
+    });
+    rewardLater(() => finishCaption(""), 420 + 3 * 380 + 700);
+  }
+
+  function resetRewardUi() {
+    clearRewardTimers();
+    state.rewardParts = null;
+    if (els.rewardTree) els.rewardTree.replaceChildren();
+    if (els.rewardFrame) {
+      els.rewardFrame.hidden = true;
+      els.rewardFrame.classList.remove("is-entering");
+    }
+    if (els.rewardCaption) {
+      els.rewardCaption.classList.remove("is-on");
+      els.rewardCaption.textContent = "";
+    }
+    if (els.btnClaimTree) {
+      els.btnClaimTree.hidden = false;
+      els.btnClaimTree.disabled = false;
+    }
+    if (els.btnDownloadTree) {
+      els.btnDownloadTree.hidden = true;
+      els.btnDownloadTree.disabled = false;
+      els.btnDownloadTree.textContent = "Скачать";
+    }
+  }
+
+  function showRewardScreen(answers) {
+    state.pendingResultsAnswers = answers;
+    resetRewardUi();
+    showScreen("reward");
+
+    const existing = readMyTree();
+    if (existing) {
+      state.rewardParts = existing.parts;
+      if (els.rewardLead) {
+        els.rewardLead.textContent =
+          "Своё дерево уже получено — повторно собрать нельзя, но можно скачать.";
+      }
+      if (els.btnClaimTree) els.btnClaimTree.hidden = true;
+      paintRewardTree(existing.parts, { animate: false });
+      return;
+    }
+
+    if (els.rewardLead) {
+      els.rewardLead.textContent =
+        "Из твоих ответов можно собрать одну картину — получить её можно только один раз.";
+    }
+  }
+
+  function claimMyTree() {
+    if (readMyTree() || state.busy) return;
+    const source = state.pendingResultsAnswers || state.answers;
+    const parts = buildTreePartsFromAnswers(source);
+    if (parts.length < 4) return;
+    state.busy = true;
+    writeMyTree(parts);
+    state.rewardParts = parts;
+    if (els.btnClaimTree) {
+      els.btnClaimTree.hidden = true;
+      els.btnClaimTree.disabled = true;
+    }
+    paintRewardTree(parts, { animate: true });
+    rewardLater(() => {
+      state.busy = false;
+    }, 420 + 3 * 380 + 700);
+  }
+
+  function loadImage(src) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.decoding = "async";
+      img.onload = () => resolve(img);
+      img.onerror = () => reject(new Error(src));
+      img.src = src;
+    });
+  }
+
+  function drawClassicFrame(ctx, size, outer, matte) {
+    const bed = ctx.createLinearGradient(0, 0, size, size);
+    bed.addColorStop(0, "#2a241c");
+    bed.addColorStop(0.45, "#1a1612");
+    bed.addColorStop(1, "#0e0c0a");
+    ctx.fillStyle = bed;
+    ctx.fillRect(0, 0, size, size);
+
+    const gold = ctx.createLinearGradient(0, 0, size, size);
+    gold.addColorStop(0, "#e0c98a");
+    gold.addColorStop(0.2, "#c4a35a");
+    gold.addColorStop(0.45, "#8a7348");
+    gold.addColorStop(0.7, "#3d2f1a");
+    gold.addColorStop(0.9, "#c4a35a");
+    gold.addColorStop(1, "#e0c98a");
+    ctx.fillStyle = gold;
+    ctx.fillRect(outer * 0.35, outer * 0.35, size - outer * 0.7, size - outer * 0.7);
+
+    ctx.fillStyle = "#1c160e";
+    const lip = outer * 0.72;
+    ctx.fillRect(lip, lip, size - lip * 2, size - lip * 2);
+
+    const matteGrad = ctx.createLinearGradient(0, lip, 0, size - lip);
+    matteGrad.addColorStop(0, "#f7f3ea");
+    matteGrad.addColorStop(1, "#f3efe6");
+    ctx.fillStyle = matteGrad;
+    ctx.fillRect(outer, outer, size - outer * 2, size - outer * 2);
+
+    const well = outer + matte;
+    ctx.fillStyle = "#111";
+    ctx.fillRect(well, well, size - well * 2, size - well * 2);
+    return well;
+  }
+
+  async function buildTreeDownloadCanvas(parts) {
+    const size = 1400;
+    const outer = 110;
+    const matte = 48;
+    const canvas = document.createElement("canvas");
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext("2d");
+    const well = drawClassicFrame(ctx, size, outer, matte);
+    const inner = size - well * 2;
+    const half = inner / 2;
+    const gap = 2;
+
+    const images = await Promise.all(
+      parts.map((p) => loadImage(imageUrl(p.image, ".jpg")))
+    );
+
+    const targets = [
+      { x: well, y: well },
+      { x: well + half + gap, y: well },
+      { x: well, y: well + half + gap },
+      { x: well + half + gap, y: well + half + gap },
+    ];
+    const sources = [
+      { sx: 0, sy: 0 },
+      { sx: 0.5, sy: 0 },
+      { sx: 0, sy: 0.5 },
+      { sx: 0.5, sy: 0.5 },
+    ];
+
+    images.forEach((img, i) => {
+      const tw = half - gap / 2;
+      const th = half - gap / 2;
+      const { x, y } = targets[i];
+      const { sx, sy } = sources[i];
+      ctx.drawImage(
+        img,
+        sx * img.naturalWidth,
+        sy * img.naturalHeight,
+        img.naturalWidth * 0.5,
+        img.naturalHeight * 0.5,
+        x,
+        y,
+        tw,
+        th
+      );
+    });
+
+    const lamp = ctx.createLinearGradient(0, well, 0, well + inner);
+    lamp.addColorStop(0, "rgba(255, 246, 220, 0.22)");
+    lamp.addColorStop(0.2, "rgba(255, 255, 255, 0.06)");
+    lamp.addColorStop(0.55, "rgba(0, 0, 0, 0)");
+    lamp.addColorStop(1, "rgba(0, 0, 0, 0.28)");
+    ctx.fillStyle = lamp;
+    ctx.fillRect(well, well, inner, inner);
+    return canvas;
+  }
+
+  async function downloadMyTree() {
+    const saved = readMyTree();
+    const parts = state.rewardParts || (saved && saved.parts);
+    if (!parts || !els.btnDownloadTree) return;
+    els.btnDownloadTree.disabled = true;
+    const prev = els.btnDownloadTree.textContent;
+    els.btnDownloadTree.textContent = "Сохраняю…";
+    try {
+      const canvas = await buildTreeDownloadCanvas(parts);
+      const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "moe-derevo.png";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      if (els.rewardCaption) {
+        els.rewardCaption.textContent = "Не удалось сохранить картинку";
+        els.rewardCaption.classList.add("is-on");
+      }
+      console.error(err);
+    } finally {
+      els.btnDownloadTree.disabled = false;
+      els.btnDownloadTree.textContent = prev;
+    }
+  }
+
   async function finishSurvey() {
     await submitAnswers(state.answers);
 
@@ -536,7 +903,7 @@
       /* ignore */
     }
 
-    await showResults(state.answers);
+    showRewardScreen(state.answers);
     state.busy = false;
   }
 
@@ -963,10 +1330,17 @@
     showResults([]);
   });
 
-  els.btnAgain.addEventListener("click", () => {
-    resetSurvey();
-    showScreen("intro");
-  });
+  if (els.btnClaimTree) {
+    els.btnClaimTree.addEventListener("click", () => claimMyTree());
+  }
+  if (els.btnDownloadTree) {
+    els.btnDownloadTree.addEventListener("click", () => downloadMyTree());
+  }
+  if (els.btnRewardResults) {
+    els.btnRewardResults.addEventListener("click", () => {
+      showResults(state.pendingResultsAnswers || getLastAnswers() || []);
+    });
+  }
 
   renderFeelingList();
   prefetchImages();

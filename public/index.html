@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=27" />
+  <link rel="stylesheet" href="styles.css?v=28" />
   <link rel="preload" as="image" href="images/tree-1.jpg" />
   <link rel="preload" as="image" href="images/tree-2.jpg" />
   <link rel="preload" as="image" href="images/tree-3.jpg" />
@@ -80,6 +80,36 @@
       </div>
     </section>
 
+    <!-- Reward: one personal hybrid tree -->
+    <section id="screen-reward" class="screen screen--reward" hidden aria-labelledby="reward-title">
+      <div class="reward-inner">
+        <p class="reward-kicker">личный итог</p>
+        <h1 id="reward-title" class="reward-title">Твоё дерево</h1>
+        <p class="reward-lead" id="reward-lead">
+          Из твоих ответов можно собрать одну картину — получить её можно только один раз.
+        </p>
+        <div class="reward-stage">
+          <figure class="picture-frame picture-frame--classic reward-frame" id="reward-frame" hidden>
+            <div class="picture-frame__moulding">
+              <div class="picture-frame__lip">
+                <div class="picture-frame__matte">
+                  <div class="picture-frame__glass">
+                    <div class="hybrid-tree" id="reward-tree" aria-hidden="true"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </figure>
+        </div>
+        <p class="reward-caption" id="reward-caption"></p>
+        <div class="reward-actions">
+          <button type="button" class="btn" id="btn-claim-tree">Получить свою картину</button>
+          <button type="button" class="btn btn--ghost btn--inline" id="btn-download-tree" hidden>Скачать</button>
+          <button type="button" class="btn btn--ghost btn--inline" id="btn-reward-results">К результатам</button>
+        </div>
+      </div>
+    </section>
+
     <!-- Results -->
     <section id="screen-results" class="screen screen--results" hidden>
       <header class="results-header">
@@ -88,10 +118,9 @@
       </header>
       <div id="results-grid" class="results-grid"></div>
       <p class="results-note" id="results-note">Данные обезличены. Каждый проход добавляется к общей сводке.</p>
-      <button type="button" class="btn btn--ghost" id="btn-again">Пройти ещё раз</button>
     </section>
   </main>
-  <script src="config.js?v=27"></script>
-  <script src="app.js?v=27"></script>
+  <script src="config.js?v=28"></script>
+  <script src="app.js?v=28"></script>
 </body>
 </html>

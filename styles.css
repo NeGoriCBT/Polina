@@ -180,7 +180,7 @@ button {
 
 .intro-inner.is-ready .fade-line {
   animation: rise-in 1.1s ease forwards;
-  animation-delay: calc(var(--d, 0) * 0.35s);
+  animation-delay: 0s;
 }
 
 @keyframes rise-in {

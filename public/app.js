@@ -1050,7 +1050,6 @@
     const EASE = "cubic-bezier(0.37, 0, 0.2, 1)";
     const EXCLUDE_BY_CORNER = { bl: new Set([3]) }; // Рококо — не в нижнем левом углу
     const REVEAL_TOTAL_MS = 2800;
-    const TEXT_DELAY_MS = 1000;
 
     const slots = [];
     const timers = new Set();
@@ -1228,6 +1227,9 @@
       changeQueue = [];
       introInner.classList.remove("is-ready");
       buildBoard();
+      // Текст сразу, без ожидания плиток.
+      void introInner.offsetWidth;
+      introInner.classList.add("is-ready");
 
       const revealOrder = slots.slice();
       for (let i = revealOrder.length - 1; i > 0; i -= 1) {
@@ -1251,9 +1253,8 @@
       });
 
       later(() => {
-        introInner.classList.add("is-ready");
         startMorphEngine();
-      }, lastRevealAt + TEXT_DELAY_MS);
+      }, lastRevealAt);
     }
 
     function stop() {

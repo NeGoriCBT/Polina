@@ -15,6 +15,11 @@
   const STORAGE_KEY = "tree-survey-submissions-v3";
   const LAST_KEY = "tree-survey-last";
 
+  /** GitHub Pages has no Node API — skip fetch noise and use localStorage. */
+  const STATIC_HOST =
+    typeof location !== "undefined" &&
+    (/\.github\.io$/i.test(location.hostname) || location.protocol === "file:");
+
   const els = {
     intro: document.getElementById("screen-intro"),
     survey: document.getElementById("screen-survey"),
@@ -37,7 +42,8 @@
     slideIndex: 0,
     answers: [],
     busy: false,
-    storageMode: "server", // "server" | "local"
+    storageMode: STATIC_HOST ? "local" : "server",
+    imageLoadId: 0,
   };
 
   function showScreen(name) {
@@ -50,29 +56,39 @@
   }
 
   function imageUrl(n, ext) {
-    // Relative path so GitHub Pages under /Polina/ works
     return `images/tree-${n}${ext}`;
   }
 
   function tryLoadImage(n, imgEl, placeholderEl, labelEl) {
+    const loadId = ++state.imageLoadId;
     labelEl.textContent = `Стиль ${n}`;
     imgEl.hidden = true;
     placeholderEl.hidden = false;
-    imgEl.removeAttribute("src");
 
     let i = 0;
     const tryNext = () => {
+      if (loadId !== state.imageLoadId) return;
       if (i >= EXT_CANDIDATES.length) return;
       const ext = EXT_CANDIDATES[i++];
-      const probe = new Image();
-      probe.onload = () => {
-        imgEl.src = imageUrl(n, ext);
+      const url = imageUrl(n, ext);
+
+      const onReady = () => {
+        if (loadId !== state.imageLoadId) return;
         imgEl.alt = `Стиль ${n}`;
         imgEl.hidden = false;
         placeholderEl.hidden = true;
       };
-      probe.onerror = tryNext;
-      probe.src = imageUrl(n, ext);
+
+      // Prefer assigning directly so the visible <img> participates in browser cache.
+      imgEl.onload = onReady;
+      imgEl.onerror = () => {
+        if (loadId !== state.imageLoadId) return;
+        tryNext();
+      };
+      imgEl.src = url;
+
+      // If cached and already complete, onload may not fire.
+      if (imgEl.complete && imgEl.naturalWidth > 0) onReady();
     };
     tryNext();
   }
@@ -121,39 +137,46 @@
   }
 
   async function submitAnswers(answers) {
-    try {
-      const res = await fetch("api/submit", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ answers }),
-      });
-      if (!res.ok) throw new Error("submit failed");
-      state.storageMode = "server";
-      return { ok: true, mode: "server" };
-    } catch {
-      const list = readLocalSubmissions();
-      list.push({
-        schema: 2,
-        submittedAt: new Date().toISOString(),
-        answers,
-      });
-      writeLocalSubmissions(list);
-      state.storageMode = "local";
-      return { ok: true, mode: "local", totalSubmissions: list.length };
+    if (!STATIC_HOST) {
+      try {
+        const res = await fetch("api/submit", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ answers }),
+        });
+        if (!res.ok) throw new Error("submit failed");
+        state.storageMode = "server";
+        return { ok: true, mode: "server" };
+      } catch {
+        /* fall through to local */
+      }
     }
+
+    const list = readLocalSubmissions();
+    list.push({
+      schema: 2,
+      submittedAt: new Date().toISOString(),
+      answers,
+    });
+    writeLocalSubmissions(list);
+    state.storageMode = "local";
+    return { ok: true, mode: "local", totalSubmissions: list.length };
   }
 
   async function loadStats() {
-    try {
-      const res = await fetch("api/stats");
-      if (!res.ok) throw new Error("stats failed");
-      const stats = await res.json();
-      state.storageMode = "server";
-      return stats;
-    } catch {
-      state.storageMode = "local";
-      return aggregateLocal(readLocalSubmissions());
+    if (!STATIC_HOST) {
+      try {
+        const res = await fetch("api/stats");
+        if (!res.ok) throw new Error("stats failed");
+        const stats = await res.json();
+        state.storageMode = "server";
+        return stats;
+      } catch {
+        /* fall through to local */
+      }
     }
+    state.storageMode = "local";
+    return aggregateLocal(readLocalSubmissions());
   }
 
   function renderSlide() {
@@ -161,7 +184,7 @@
     const n = slide.image;
 
     els.progressImage.textContent = `Стиль ${n} из ${SLIDE_COUNT}`;
-    els.progressQuestion.textContent = `Вопрос ${state.slideIndex + 1} из ${SLIDE_COUNT}`;
+    els.progressQuestion.textContent = `Картинка ${state.slideIndex + 1} из ${SLIDE_COUNT}`;
     els.questionText.textContent = slide.text;
 
     tryLoadImage(n, els.surveyImage, els.imagePlaceholder, els.imageLabel);
@@ -345,6 +368,14 @@
     return new Promise((r) => setTimeout(r, ms));
   }
 
+  // Warm the browser cache so slides 2–7 appear faster.
+  function prefetchImages() {
+    for (let n = 1; n <= SLIDE_COUNT; n++) {
+      const img = new Image();
+      img.src = imageUrl(n, ".png");
+    }
+  }
+
   els.btnStart.addEventListener("click", () => {
     resetSurvey();
     showScreen("survey");
@@ -360,4 +391,6 @@
       line.style.animation = "";
     }
   });
+
+  prefetchImages();
 })();

@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css?v=4" />
 </head>
 <body>
   <main id="app">
@@ -18,7 +18,7 @@
         <h1 id="intro-title" class="intro-title fade-line" style="--d:1">Дерево<br />в разных стилях</h1>
         <p class="intro-text fade-line" style="--d:2">
           Вам покажут одно и то же дерево в семи стилях.
-          После каждой картинки — один короткий вопрос с одним выбором.
+          После каждой картинки — один и тот же вопрос: что вы чувствуете в первую очередь.
           Ответы обезличены и складываются в общую статистику.
         </p>
         <button type="button" class="btn fade-line" style="--d:3" id="btn-start">Далее</button>
@@ -30,7 +30,7 @@
       <header class="survey-meta">
         <span id="progress-image">Стиль 1 из 7</span>
         <span class="dot" aria-hidden="true">·</span>
-        <span id="progress-question">Вопрос 1 из 7</span>
+        <span id="progress-question">Картинка 1 из 7</span>
       </header>
       <div class="survey-layout">
         <figure class="frame" id="image-frame">
@@ -57,6 +57,6 @@
       <button type="button" class="btn btn--ghost" id="btn-again">Пройти ещё раз</button>
     </section>
   </main>
-  <script src="app.js"></script>
+  <script src="app.js?v=4"></script>
 </body>
 </html>

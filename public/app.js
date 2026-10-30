@@ -15,10 +15,15 @@
   const STORAGE_KEY = "tree-survey-submissions-v3";
   const LAST_KEY = "tree-survey-last";
 
-  /** GitHub Pages has no Node API — skip fetch noise and use localStorage. */
+  /** GitHub Pages has no Node API. */
   const STATIC_HOST =
     typeof location !== "undefined" &&
     (/\.github\.io$/i.test(location.hostname) || location.protocol === "file:");
+
+  const remoteCfg =
+    (typeof window !== "undefined" && window.TREE_SURVEY_CONFIG && window.TREE_SURVEY_CONFIG.remote) || null;
+  const HAS_REMOTE =
+    !!(remoteCfg && remoteCfg.provider === "mantledb" && remoteCfg.baseUrl && remoteCfg.namespace && remoteCfg.key);
 
   const els = {
     intro: document.getElementById("screen-intro"),
@@ -42,7 +47,7 @@
     slideIndex: 0,
     answers: [],
     busy: false,
-    storageMode: STATIC_HOST ? "local" : "server",
+    storageMode: HAS_REMOTE ? "remote" : STATIC_HOST ? "local" : "server",
   };
 
   function showScreen(name) {
@@ -108,7 +113,24 @@
     localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
   }
 
-  function aggregateLocal(submissions) {
+  function isCompleteSubmission(sub) {
+    return (
+      sub &&
+      Array.isArray(sub.answers) &&
+      sub.answers.length === SLIDE_COUNT &&
+      sub.answers.every(
+        (row, i) =>
+          row &&
+          Number(row.image) === i + 1 &&
+          row.id === "feeling" &&
+          typeof row.value === "string" &&
+          FEELING_OPTIONS.includes(row.value)
+      )
+    );
+  }
+
+  function aggregateSubmissions(submissions, source) {
+    const valid = submissions.filter(isCompleteSubmission);
     const images = SLIDES.map((slide) => ({
       image: slide.image,
       label: `Стиль ${slide.image}`,
@@ -116,28 +138,79 @@
       counts: Object.fromEntries(slide.options.map((o) => [o, 0])),
     }));
 
-    for (const sub of submissions) {
-      if (!sub || !Array.isArray(sub.answers)) continue;
+    for (const sub of valid) {
       for (const row of sub.answers) {
         const idx = Number(row.image) - 1;
-        if (idx < 0 || idx >= SLIDE_COUNT) continue;
-        const slide = SLIDES[idx];
-        if (row.id !== slide.id) continue;
-        if (typeof row.value === "string" && Object.prototype.hasOwnProperty.call(images[idx].counts, row.value)) {
-          images[idx].counts[row.value] += 1;
-        }
+        images[idx].counts[row.value] += 1;
       }
     }
 
     return {
       schema: 2,
-      totalSubmissions: submissions.length,
+      totalSubmissions: valid.length,
       images,
-      source: "local",
+      source,
     };
   }
 
+  function newSubmissionId() {
+    return (
+      Date.now().toString(36) +
+      "-" +
+      Math.random().toString(36).slice(2, 10)
+    );
+  }
+
+  async function remoteSubmit(answers) {
+    const id = newSubmissionId();
+    const entry = {
+      schema: 2,
+      submittedAt: new Date().toISOString(),
+      answers,
+    };
+    const url = `${remoteCfg.baseUrl.replace(/\/$/, "")}/${encodeURIComponent(remoteCfg.namespace)}/submissions/${encodeURIComponent(id)}`;
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Mantle-Key": remoteCfg.key,
+      },
+      body: JSON.stringify(entry),
+    });
+    if (!res.ok) throw new Error("remote submit failed");
+    return entry;
+  }
+
+  async function remoteFetchSubmissions() {
+    const url = `${remoteCfg.baseUrl.replace(/\/$/, "")}/export/${encodeURIComponent(remoteCfg.namespace)}`;
+    const res = await fetch(url, {
+      headers: { "X-Mantle-Key": remoteCfg.key },
+    });
+    if (!res.ok) throw new Error("remote export failed");
+    const data = await res.json();
+    const entries = (data && data.entries) || {};
+    const list = [];
+    for (const [path, value] of Object.entries(entries)) {
+      if (!String(path).startsWith("submissions/")) continue;
+      list.push(value);
+    }
+    return list;
+  }
+
   async function submitAnswers(answers) {
+    let mode = null;
+
+    // Shared cloud store (Pages + optional dual-write from local).
+    if (HAS_REMOTE) {
+      try {
+        await remoteSubmit(answers);
+        mode = "remote";
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    // Local Node API when running via npm start.
     if (!STATIC_HOST) {
       try {
         const res = await fetch("api/submit", {
@@ -146,11 +219,15 @@
           body: JSON.stringify({ answers }),
         });
         if (!res.ok) throw new Error("submit failed");
-        state.storageMode = "server";
-        return { ok: true, mode: "server" };
+        if (!mode) mode = "server";
       } catch {
-        /* fall through to local */
+        /* ignore if remote already saved */
       }
+    }
+
+    if (mode) {
+      state.storageMode = mode;
+      return { ok: true, mode };
     }
 
     const list = readLocalSubmissions();
@@ -165,6 +242,16 @@
   }
 
   async function loadStats() {
+    if (HAS_REMOTE) {
+      try {
+        const remoteList = await remoteFetchSubmissions();
+        state.storageMode = "remote";
+        return aggregateSubmissions(remoteList, "remote");
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
     if (!STATIC_HOST) {
       try {
         const res = await fetch("api/stats");
@@ -173,11 +260,12 @@
         state.storageMode = "server";
         return stats;
       } catch {
-        /* fall through to local */
+        /* fall through */
       }
     }
+
     state.storageMode = "local";
-    return aggregateLocal(readLocalSubmissions());
+    return aggregateSubmissions(readLocalSubmissions(), "local");
   }
 
   function renderSlide() {
@@ -276,10 +364,16 @@
           : `${n} прохождений`;
 
     if (els.resultsNote) {
-      els.resultsNote.textContent =
-        state.storageMode === "local"
-          ? "Сейчас статистика хранится в этом браузере (на GitHub Pages нет общего сервера). Для общей сводки у всех запускайте npm start локально."
-          : "Данные обезличены. Каждый проход добавляется к общей сводке на сервере.";
+      if (state.storageMode === "remote") {
+        els.resultsNote.textContent =
+          "Данные обезличены. Общая сводка копится у всех посетителей сайта (облачное хранилище MantleDB).";
+      } else if (state.storageMode === "server") {
+        els.resultsNote.textContent =
+          "Данные обезличены. Каждый проход добавляется к общей сводке на локальном сервере (data/submissions.json).";
+      } else {
+        els.resultsNote.textContent =
+          "Сейчас статистика только в этом браузере (резервный режим). Проверьте интернет — для общей сводки нужен доступ к облаку.";
+      }
     }
 
     const imageStatsList = stats.images || [];

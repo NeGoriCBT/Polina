@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=23" />
+  <link rel="stylesheet" href="styles.css?v=24" />
   <link rel="preload" as="image" href="images/tree-1.jpg" />
   <link rel="preload" as="image" href="images/tree-2.jpg" />
   <link rel="preload" as="image" href="images/tree-3.jpg" />
@@ -56,10 +56,6 @@
 
     <!-- Survey -->
     <section id="screen-survey" class="screen screen--survey" hidden aria-live="polite">
-      <header class="survey-style" aria-live="polite">
-        <h2 class="survey-style-name" id="style-name">Ренессанс</h2>
-        <span class="survey-style-year" id="style-year">~1400</span>
-      </header>
       <div class="survey-layout">
         <figure class="picture-frame picture-frame--classic" id="image-frame">
           <div class="picture-frame__moulding">
@@ -76,6 +72,10 @@
           </div>
         </figure>
         <div class="question-panel">
+          <header class="survey-style" aria-live="polite">
+            <h2 class="survey-style-name" id="style-name">Ренессанс</h2>
+            <span class="survey-style-year" id="style-year">~1400</span>
+          </header>
           <h2 class="question-text" id="question-text"></h2>
           <div class="feeling-picker" id="feeling-picker">
             <button type="button" class="feeling-arrow" id="feeling-prev" aria-label="Предыдущее чувство">
@@ -109,7 +109,7 @@
       <button type="button" class="btn btn--ghost" id="btn-again">Пройти ещё раз</button>
     </section>
   </main>
-  <script src="config.js?v=23"></script>
-  <script src="app.js?v=23"></script>
+  <script src="config.js?v=24"></script>
+  <script src="app.js?v=24"></script>
 </body>
 </html>

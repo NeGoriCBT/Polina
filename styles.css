@@ -219,15 +219,16 @@ button {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
-  gap: 0.35rem 1.1rem;
-  padding-bottom: 0.25rem;
+  gap: 0.3rem 0.85rem;
+  margin: 0 0 0.85rem;
+  padding-bottom: 0;
 }
 
 .survey-style-name {
   margin: 0;
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: clamp(1.85rem, 4.5vw, 2.75rem);
+  font-size: clamp(1.55rem, 3vw, 2.15rem);
   line-height: 1.1;
   letter-spacing: -0.02em;
 }
@@ -235,7 +236,7 @@ button {
 .survey-style-year {
   color: var(--muted);
   font-family: var(--font-body);
-  font-size: clamp(0.95rem, 2vw, 1.15rem);
+  font-size: clamp(0.9rem, 1.8vw, 1.05rem);
   letter-spacing: 0.04em;
   font-variant-numeric: tabular-nums;
 }

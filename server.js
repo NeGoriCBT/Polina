@@ -16,8 +16,25 @@ const SLIDE_COUNT = 14;
 
 /** Same feeling question for every image (tree-1 … tree-14). */
 const FEELING_OPTIONS = ["спокойствие", "тревогу", "радость", "грусть", "ничего особенного"];
-const SLIDES = Array.from({ length: SLIDE_COUNT }, (_, i) => ({
+const STYLE_LABELS = [
+  "Ренессанс ~1400",
+  "Барокко ~1600",
+  "Рококо ~1730",
+  "Классицизм ~1750",
+  "Импрессионизм ~1874",
+  "Фовизм ~1905",
+  "Экспрессионизм ~1905",
+  "Кубизм ~1907",
+  "Авангардизм ~1910",
+  "Абстракционизм ~1910",
+  "Супрематизм ~1915",
+  "Дадаизм ~1916",
+  "Сюрреализм ~1924",
+  "Активная живопись ~1945",
+];
+const SLIDES = STYLE_LABELS.map((label, i) => ({
   image: i + 1,
+  label,
   id: "feeling",
   text: "Что вы чувствуете в первую очередь?",
   options: FEELING_OPTIONS,
@@ -76,7 +93,7 @@ function aggregate(submissions) {
   const valid = submissions.filter(isCompleteSubmission);
   const images = SLIDES.map((slide) => ({
     image: slide.image,
-    label: `Стиль ${slide.image}`,
+    label: slide.label,
     question: { id: slide.id, text: slide.text, options: slide.options },
     counts: Object.fromEntries(slide.options.map((o) => [o, 0])),
   }));

@@ -3,8 +3,25 @@
 
   /** Same feeling question for every image (tree-1 … tree-14). */
   const FEELING_OPTIONS = ["спокойствие", "тревогу", "радость", "грусть", "ничего особенного"];
-  const SLIDES = Array.from({ length: 14 }, (_, i) => ({
+  const STYLE_LABELS = [
+    "Ренессанс ~1400",
+    "Барокко ~1600",
+    "Рококо ~1730",
+    "Классицизм ~1750",
+    "Импрессионизм ~1874",
+    "Фовизм ~1905",
+    "Экспрессионизм ~1905",
+    "Кубизм ~1907",
+    "Авангардизм ~1910",
+    "Абстракционизм ~1910",
+    "Супрематизм ~1915",
+    "Дадаизм ~1916",
+    "Сюрреализм ~1924",
+    "Активная живопись ~1945",
+  ];
+  const SLIDES = STYLE_LABELS.map((label, i) => ({
     image: i + 1,
+    label,
     id: "feeling",
     text: "Что вы чувствуете в первую очередь?",
     options: FEELING_OPTIONS,
@@ -65,11 +82,16 @@
     return `images/tree-${n}${ext}`;
   }
 
+  function styleLabel(n) {
+    return (SLIDES[n - 1] && SLIDES[n - 1].label) || `Стиль ${n}`;
+  }
+
   function tryLoadImage(n, imgEl, placeholderEl, labelEl) {
     // Per-element generation so results-page loads don't cancel each other,
     // while rapid slide changes still drop stale callbacks.
     const loadId = (imgEl._treeLoadId = (imgEl._treeLoadId || 0) + 1);
-    labelEl.textContent = `Стиль ${n}`;
+    const title = styleLabel(n);
+    labelEl.textContent = title;
     imgEl.hidden = true;
     placeholderEl.hidden = false;
 
@@ -82,7 +104,7 @@
 
       const onReady = () => {
         if (loadId !== imgEl._treeLoadId) return;
-        imgEl.alt = `Стиль ${n}`;
+        imgEl.alt = title;
         imgEl.hidden = false;
         placeholderEl.hidden = true;
       };
@@ -136,7 +158,7 @@
     const valid = submissions.filter(isCompleteSubmission);
     const images = SLIDES.map((slide) => ({
       image: slide.image,
-      label: `Стиль ${slide.image}`,
+      label: slide.label,
       question: { id: slide.id, text: slide.text, options: slide.options },
       counts: Object.fromEntries(slide.options.map((o) => [o, 0])),
     }));
@@ -276,8 +298,8 @@
     const slide = SLIDES[state.slideIndex];
     const n = slide.image;
 
-    els.progressImage.textContent = `Стиль ${n} из ${SLIDE_COUNT}`;
-    els.progressQuestion.textContent = `Картинка ${state.slideIndex + 1} из ${SLIDE_COUNT}`;
+    els.progressImage.textContent = slide.label;
+    els.progressQuestion.textContent = `${state.slideIndex + 1} из ${SLIDE_COUNT}`;
     els.questionText.textContent = slide.text;
 
     tryLoadImage(n, els.surveyImage, els.imagePlaceholder, els.imageLabel);
@@ -399,14 +421,14 @@
       const ph = document.createElement("div");
       ph.className = "frame-placeholder";
       const lab = document.createElement("span");
-      lab.textContent = `Стиль ${slide.image}`;
+      lab.textContent = slide.label;
       ph.appendChild(lab);
       frame.append(img, ph);
 
       const statsCol = document.createElement("div");
       statsCol.className = "result-stats";
       const h2 = document.createElement("h2");
-      h2.textContent = `Стиль ${slide.image}`;
+      h2.textContent = slide.label;
       statsCol.appendChild(h2);
 
       const wrap = document.createElement("div");

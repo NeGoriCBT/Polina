@@ -479,7 +479,8 @@
   });
 
   els.btnResults.addEventListener("click", () => {
-    showResults(null);
+    // Empty array: show shared aggregates only (no “ваш ответ” from a prior run).
+    showResults([]);
   });
 
   els.btnAgain.addEventListener("click", () => {

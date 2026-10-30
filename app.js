@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  /** Same feeling question for every image (tree-1 … tree-14). */
+  /** Same feeling question for every image (tree-1 … tree-15). */
   const FEELING_OPTIONS = ["спокойствие", "тревогу", "радость", "грусть", "ничего особенного"];
   const STYLES = [
     { name: "Ренессанс", year: "~1400" },
@@ -18,6 +18,7 @@
     { name: "Дадаизм", year: "~1916" },
     { name: "Сюрреализм", year: "~1924" },
     { name: "Активная живопись", year: "~1945" },
+    { name: "Минимализм", year: "~1960" },
   ];
   const SLIDES = STYLES.map((style, i) => ({
     image: i + 1,
@@ -31,9 +32,9 @@
 
   const SLIDE_COUNT = SLIDES.length;
   const EXT_CANDIDATES = [".png", ".jpg", ".jpeg", ".webp"];
-  const STORAGE_KEY = "tree-survey-submissions-v4";
-  const LAST_KEY = "tree-survey-last-v4";
-  const SUBMISSION_SCHEMA = 3;
+  const STORAGE_KEY = "tree-survey-submissions-v5";
+  const LAST_KEY = "tree-survey-last-v5";
+  const SUBMISSION_SCHEMA = 4;
 
   /** GitHub Pages has no Node API. */
   const STATIC_HOST =
@@ -195,8 +196,8 @@
       submittedAt: new Date().toISOString(),
       answers,
     };
-    // Path prefix submissions14/ — old 7-answer rows under submissions/ are ignored.
-    const url = `${remoteCfg.baseUrl.replace(/\/$/, "")}/${encodeURIComponent(remoteCfg.namespace)}/submissions14/${encodeURIComponent(id)}`;
+    // Path prefix submissions15/ — older 7/14-answer rows are ignored.
+    const url = `${remoteCfg.baseUrl.replace(/\/$/, "")}/${encodeURIComponent(remoteCfg.namespace)}/submissions15/${encodeURIComponent(id)}`;
     const res = await fetch(url, {
       method: "POST",
       headers: {
@@ -219,7 +220,7 @@
     const entries = (data && data.entries) || {};
     const list = [];
     for (const [path, value] of Object.entries(entries)) {
-      if (!String(path).startsWith("submissions14/")) continue;
+      if (!String(path).startsWith("submissions15/")) continue;
       list.push(value);
     }
     return list;

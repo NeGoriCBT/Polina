@@ -31,10 +31,12 @@
   }));
 
   const SLIDE_COUNT = SLIDES.length;
-  const EXT_CANDIDATES = [".png", ".jpg", ".jpeg", ".webp"];
+  const EXT_CANDIDATES = [".jpg", ".jpeg", ".webp", ".png"];
   const STORAGE_KEY = "tree-survey-submissions-v5";
   const LAST_KEY = "tree-survey-last-v5";
   const SUBMISSION_SCHEMA = 4;
+  /** Preloaded image URLs → HTMLImageElement (complete). */
+  const imageCache = new Map();
 
   /** GitHub Pages has no Node API. */
   const STATIC_HOST =
@@ -89,39 +91,62 @@
     return SLIDES[n - 1] || { name: `Стиль ${n}`, year: "", label: `Стиль ${n}` };
   }
 
-  function tryLoadImage(n, imgEl, placeholderEl, labelEl) {
-    // Per-element generation so results-page loads don't cancel each other,
-    // while rapid slide changes still drop stale callbacks.
+  function preferredImageUrl(n) {
+    for (const ext of EXT_CANDIDATES) {
+      const url = imageUrl(n, ext);
+      if (imageCache.has(url)) return url;
+    }
+    return imageUrl(n, EXT_CANDIDATES[0]);
+  }
+
+  function showImage(n, imgEl, placeholderEl, labelEl) {
     const loadId = (imgEl._treeLoadId = (imgEl._treeLoadId || 0) + 1);
     const style = styleFor(n);
     labelEl.textContent = style.name;
-    imgEl.hidden = true;
-    placeholderEl.hidden = false;
 
+    const apply = (url) => {
+      if (loadId !== imgEl._treeLoadId) return;
+      imgEl.alt = style.label;
+      imgEl.onload = null;
+      imgEl.onerror = null;
+      imgEl.src = url;
+      imgEl.hidden = false;
+      placeholderEl.hidden = true;
+    };
+
+    // Instant path: already prefetched.
+    const cachedUrl = preferredImageUrl(n);
+    const cached = imageCache.get(cachedUrl);
+    if (cached && cached.complete && cached.naturalWidth > 0) {
+      apply(cachedUrl);
+      return;
+    }
+
+    // Keep previous picture visible until the next one is ready (no empty flash).
     let i = 0;
     const tryNext = () => {
       if (loadId !== imgEl._treeLoadId) return;
-      if (i >= EXT_CANDIDATES.length) return;
+      if (i >= EXT_CANDIDATES.length) {
+        // Nothing loaded — show placeholder only now.
+        imgEl.hidden = true;
+        placeholderEl.hidden = false;
+        return;
+      }
       const ext = EXT_CANDIDATES[i++];
       const url = imageUrl(n, ext);
-
+      const probe = imageCache.get(url) || new Image();
       const onReady = () => {
         if (loadId !== imgEl._treeLoadId) return;
-        imgEl.alt = style.label;
-        imgEl.hidden = false;
-        placeholderEl.hidden = true;
+        imageCache.set(url, probe);
+        apply(url);
       };
-
-      // Prefer assigning directly so the visible <img> participates in browser cache.
-      imgEl.onload = onReady;
-      imgEl.onerror = () => {
+      probe.onload = onReady;
+      probe.onerror = () => {
         if (loadId !== imgEl._treeLoadId) return;
         tryNext();
       };
-      imgEl.src = url;
-
-      // If cached and already complete, onload may not fire.
-      if (imgEl.complete && imgEl.naturalWidth > 0) onReady();
+      if (!probe.src) probe.src = url;
+      if (probe.complete && probe.naturalWidth > 0) onReady();
     };
     tryNext();
   }
@@ -305,7 +330,7 @@
     els.styleYear.textContent = slide.year;
     els.questionText.textContent = slide.text;
 
-    tryLoadImage(n, els.surveyImage, els.imagePlaceholder, els.imageLabel);
+    showImage(n, els.surveyImage, els.imagePlaceholder, els.imageLabel);
 
     const panel = document.querySelector(".question-panel");
     const frame = document.getElementById("image-frame");
@@ -485,7 +510,7 @@
       statsCol.appendChild(wrap);
       block.append(frame, statsCol);
       els.resultsGrid.appendChild(block);
-      tryLoadImage(slide.image, img, ph, lab);
+      showImage(slide.image, img, ph, lab);
     }
   }
 
@@ -499,11 +524,23 @@
     return new Promise((r) => setTimeout(r, ms));
   }
 
-  // Warm the browser cache so slides 2–7 appear faster.
   function prefetchImages() {
     for (let n = 1; n <= SLIDE_COUNT; n++) {
-      const img = new Image();
-      img.src = imageUrl(n, ".png");
+      for (const ext of EXT_CANDIDATES) {
+        const url = imageUrl(n, ext);
+        if (imageCache.has(url)) break;
+        const img = new Image();
+        img.decoding = "async";
+        img.onload = () => {
+          imageCache.set(url, img);
+        };
+        img.onerror = () => {
+          /* try next extension via separate Image in showImage if needed */
+        };
+        img.src = url;
+        // Only kick the preferred .jpg; other formats exist only as rare fallbacks.
+        break;
+      }
     }
   }
 

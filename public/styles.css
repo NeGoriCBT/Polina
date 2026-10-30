@@ -49,14 +49,65 @@ button {
 
 /* ——— Intro ——— */
 .screen--intro {
-  display: grid;
-  place-items: center;
+  position: relative;
+  display: block;
+  padding: 0;
+  overflow: hidden;
   background: #000;
 }
 
-.intro-inner {
-  max-width: 32rem;
+.intro-collage {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 3px;
+  background: #000;
+}
+
+.intro-collage img {
   width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  opacity: 0;
+  transform: scale(1.06);
+  animation: collage-tile 0.9s ease forwards;
+  animation-delay: calc(var(--i, 0) * 0.045s + 0.05s);
+  filter: grayscale(0.15) contrast(1.05);
+}
+
+@keyframes collage-tile {
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.intro-veil {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 70% 60% at 50% 45%, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0.78) 70%, rgba(0, 0, 0, 0.92) 100%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0.35) 40%, rgba(0, 0, 0, 0.75) 100%);
+}
+
+.intro-overlay {
+  position: relative;
+  z-index: 2;
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 2rem clamp(1.25rem, 4vw, 3rem);
+}
+
+.intro-inner {
+  max-width: 34rem;
+  width: 100%;
+  text-align: center;
 }
 
 .intro-kicker {
@@ -64,22 +115,23 @@ button {
   font-size: 0.75rem;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: var(--muted);
+  color: #b0b0b0;
 }
 
 .intro-title {
   margin: 0 0 1.5rem;
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: clamp(2.75rem, 8vw, 4.25rem);
+  font-size: clamp(2.75rem, 8vw, 4.5rem);
   line-height: 1.05;
   letter-spacing: -0.02em;
+  text-shadow: 0 2px 28px rgba(0, 0, 0, 0.55);
 }
 
 .intro-text {
-  margin: 0 0 2.5rem;
+  margin: 0 auto 2.5rem;
   max-width: 28rem;
-  color: #c8c8c8;
+  color: #d4d4d4;
   font-size: 1.05rem;
   line-height: 1.65;
 }
@@ -88,13 +140,24 @@ button {
   opacity: 0;
   transform: translateY(0.6rem);
   animation: rise-in 1.1s ease forwards;
-  animation-delay: calc(var(--d, 0) * 0.35s + 0.2s);
+  animation-delay: calc(var(--d, 0) * 0.35s + 0.55s);
 }
 
 @keyframes rise-in {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+.intro-actions {
+  justify-content: center;
+}
+
+@media (max-width: 720px) {
+  .intro-collage {
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(5, 1fr);
   }
 }
 

@@ -220,7 +220,7 @@ const server = http.createServer(async (req, res) => {
       if (!clean) return send(res, 400, { error: "invalid submission" });
 
       const entry = {
-        schema: 4,
+        schema: 5,
         submittedAt: new Date().toISOString(),
         answers: clean.answers,
       };

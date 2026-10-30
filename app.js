@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  /** Same feeling question for every image (tree-1 … tree-16).
+  /** Same feeling question for every image.
    *  Left = lighter/calmer → center Спокойствие → right = heavier/sadder. */
   const FEELING_OPTIONS = [
     "Вдохновение",
@@ -16,29 +16,33 @@
   ];
   const FEELING_MID = 4;
   const FEELING_LAST = FEELING_OPTIONS.length - 1;
+  /** Chronological survey order; `image` = tree-N.jpg slot. */
   const STYLES = [
-    { name: "Ренессанс", year: "~1400", frame: "classic" },
-    { name: "Барокко", year: "~1600", frame: "baroque" },
-    { name: "Рококо", year: "~1730", frame: "rococo" },
-    { name: "Классицизм", year: "~1750", frame: "classicist" },
-    { name: "Импрессионизм", year: "~1874", frame: "impression" },
-    { name: "Фовизм", year: "~1905", frame: "darkwood" },
-    { name: "Экспрессионизм", year: "~1905", frame: "darkwood" },
-    { name: "Кубизм", year: "~1907", frame: "black" },
-    { name: "Авангардизм", year: "~1910", frame: "black" },
-    { name: "Абстракционизм", year: "~1910", frame: "gallery" },
-    { name: "Супрематизм", year: "~1915", frame: "suprematist" },
-    { name: "Дадаизм", year: "~1916", frame: "dada" },
-    { name: "Сюрреализм", year: "~1924", frame: "surreal" },
-    { name: "Активная живопись", year: "~1945", frame: "action" },
-    { name: "Минимализм", year: "~1960", frame: "minimal" },
-    { name: "Поп-арт", year: "~1962", frame: "pop" },
+    { name: "Ренессанс", year: "~1400", frame: "classic", image: 1 },
+    { name: "Барокко", year: "~1600", frame: "baroque", image: 2 },
+    { name: "Рококо", year: "~1730", frame: "rococo", image: 3 },
+    { name: "Классицизм", year: "~1750", frame: "classicist", image: 4 },
+    { name: "Романтизм", year: "~1820", frame: "romantic", image: 17 },
+    { name: "Импрессионизм", year: "~1874", frame: "impression", image: 5 },
+    { name: "Фовизм", year: "~1905", frame: "darkwood", image: 6 },
+    { name: "Экспрессионизм", year: "~1905", frame: "darkwood", image: 7 },
+    { name: "Кубизм", year: "~1907", frame: "black", image: 8 },
+    { name: "Авангардизм", year: "~1910", frame: "black", image: 9 },
+    { name: "Абстракционизм", year: "~1910", frame: "gallery", image: 10 },
+    { name: "Супрематизм", year: "~1915", frame: "suprematist", image: 11 },
+    { name: "Дадаизм", year: "~1916", frame: "dada", image: 12 },
+    { name: "Сюрреализм", year: "~1924", frame: "surreal", image: 13 },
+    { name: "Активная живопись", year: "~1945", frame: "action", image: 14 },
+    { name: "Минимализм", year: "~1960", frame: "minimal", image: 15 },
+    { name: "Поп-арт", year: "~1962", frame: "pop", image: 16 },
+    { name: "Постмодернизм", year: "~1980", frame: "postmodern", image: 18 },
   ];
   const FRAME_TYPES = [
     "classic",
     "baroque",
     "rococo",
     "classicist",
+    "romantic",
     "impression",
     "darkwood",
     "black",
@@ -49,9 +53,10 @@
     "action",
     "minimal",
     "pop",
+    "postmodern",
   ];
-  const SLIDES = STYLES.map((style, i) => ({
-    image: i + 1,
+  const SLIDES = STYLES.map((style) => ({
+    image: style.image,
     name: style.name,
     year: style.year,
     frame: style.frame,
@@ -63,9 +68,9 @@
 
   const SLIDE_COUNT = SLIDES.length;
   const EXT_CANDIDATES = [".jpg", ".jpeg", ".webp", ".png"];
-  const STORAGE_KEY = "tree-survey-submissions-v8";
-  const LAST_KEY = "tree-survey-last-v8";
-  const SUBMISSION_SCHEMA = 7;
+  const STORAGE_KEY = "tree-survey-submissions-v9";
+  const LAST_KEY = "tree-survey-last-v9";
+  const SUBMISSION_SCHEMA = 8;
   /** Preloaded image URLs → HTMLImageElement (complete). */
   const imageCache = new Map();
 
@@ -125,7 +130,14 @@
   }
 
   function styleFor(n) {
-    return SLIDES[n - 1] || { name: `Стиль ${n}`, year: "", label: `Стиль ${n}`, frame: "classic" };
+    return (
+      SLIDES.find((s) => s.image === n) || {
+        name: `Стиль ${n}`,
+        year: "",
+        label: `Стиль ${n}`,
+        frame: "classic",
+      }
+    );
   }
 
   function setPictureFrame(el, frameType) {
@@ -249,7 +261,7 @@
       sub.answers.every(
         (row, i) =>
           row &&
-          Number(row.image) === i + 1 &&
+          Number(row.image) === SLIDES[i].image &&
           row.id === "feeling" &&
           typeof row.value === "string" &&
           FEELING_OPTIONS.includes(row.value)
@@ -268,8 +280,11 @@
 
     for (const sub of valid) {
       for (const row of sub.answers) {
-        const idx = Number(row.image) - 1;
-        images[idx].counts[row.value] += 1;
+        const idx = SLIDES.findIndex((s) => s.image === Number(row.image));
+        if (idx < 0) continue;
+        if (typeof row.value === "string" && Object.prototype.hasOwnProperty.call(images[idx].counts, row.value)) {
+          images[idx].counts[row.value] += 1;
+        }
       }
     }
 
@@ -296,8 +311,8 @@
       submittedAt: new Date().toISOString(),
       answers,
     };
-    // Path prefix submissions16/ — resets aggregates for the 16-image set.
-    const url = `${remoteCfg.baseUrl.replace(/\/$/, "")}/${encodeURIComponent(remoteCfg.namespace)}/submissions16/${encodeURIComponent(id)}`;
+    // Path prefix submissions18/ — resets aggregates for the 18-image set.
+    const url = `${remoteCfg.baseUrl.replace(/\/$/, "")}/${encodeURIComponent(remoteCfg.namespace)}/submissions18/${encodeURIComponent(id)}`;
     const res = await fetch(url, {
       method: "POST",
       headers: {
@@ -320,7 +335,7 @@
     const entries = (data && data.entries) || {};
     const list = [];
     for (const [path, value] of Object.entries(entries)) {
-      if (!String(path).startsWith("submissions16/")) continue;
+      if (!String(path).startsWith("submissions18/")) continue;
       list.push(value);
     }
     return list;
@@ -617,7 +632,8 @@
   }
 
   function prefetchImages() {
-    for (let n = 1; n <= SLIDE_COUNT; n++) {
+    for (const slide of SLIDES) {
+      const n = slide.image;
       for (const ext of EXT_CANDIDATES) {
         const url = imageUrl(n, ext);
         if (imageCache.has(url)) break;

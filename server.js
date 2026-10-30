@@ -12,9 +12,6 @@ const DATA_DIR = path.join(ROOT, "data");
 const DATA_FILE = path.join(DATA_DIR, "submissions.json");
 // Static site lives at repo root (GitHub Pages + local npm start).
 
-const SLIDE_COUNT = 16;
-
-/** Same feeling question for every image (tree-1 … tree-16). */
 const FEELING_OPTIONS = [
   "Вдохновение",
   "Радость",
@@ -26,26 +23,29 @@ const FEELING_OPTIONS = [
   "Тревога",
   "Раздражение",
 ];
+/** Chronological survey order; `image` = tree-N.jpg slot. */
 const STYLES = [
-  { name: "Ренессанс", year: "~1400" },
-  { name: "Барокко", year: "~1600" },
-  { name: "Рококо", year: "~1730" },
-  { name: "Классицизм", year: "~1750" },
-  { name: "Импрессионизм", year: "~1874" },
-  { name: "Фовизм", year: "~1905" },
-  { name: "Экспрессионизм", year: "~1905" },
-  { name: "Кубизм", year: "~1907" },
-  { name: "Авангардизм", year: "~1910" },
-  { name: "Абстракционизм", year: "~1910" },
-  { name: "Супрематизм", year: "~1915" },
-  { name: "Дадаизм", year: "~1916" },
-  { name: "Сюрреализм", year: "~1924" },
-  { name: "Активная живопись", year: "~1945" },
-  { name: "Минимализм", year: "~1960" },
-  { name: "Поп-арт", year: "~1962" },
+  { name: "Ренессанс", year: "~1400", image: 1 },
+  { name: "Барокко", year: "~1600", image: 2 },
+  { name: "Рококо", year: "~1730", image: 3 },
+  { name: "Классицизм", year: "~1750", image: 4 },
+  { name: "Романтизм", year: "~1820", image: 17 },
+  { name: "Импрессионизм", year: "~1874", image: 5 },
+  { name: "Фовизм", year: "~1905", image: 6 },
+  { name: "Экспрессионизм", year: "~1905", image: 7 },
+  { name: "Кубизм", year: "~1907", image: 8 },
+  { name: "Авангардизм", year: "~1910", image: 9 },
+  { name: "Абстракционизм", year: "~1910", image: 10 },
+  { name: "Супрематизм", year: "~1915", image: 11 },
+  { name: "Дадаизм", year: "~1916", image: 12 },
+  { name: "Сюрреализм", year: "~1924", image: 13 },
+  { name: "Активная живопись", year: "~1945", image: 14 },
+  { name: "Минимализм", year: "~1960", image: 15 },
+  { name: "Поп-арт", year: "~1962", image: 16 },
+  { name: "Постмодернизм", year: "~1980", image: 18 },
 ];
-const SLIDES = STYLES.map((style, i) => ({
-  image: i + 1,
+const SLIDES = STYLES.map((style) => ({
+  image: style.image,
   name: style.name,
   year: style.year,
   label: `${style.name} ${style.year}`,
@@ -53,6 +53,7 @@ const SLIDES = STYLES.map((style, i) => ({
   text: "Что вы чувствуете в первую очередь?",
   options: FEELING_OPTIONS,
 }));
+const SLIDE_COUNT = SLIDES.length;
 
 const MIME = {
   ".html": "text/html; charset=utf-8",
@@ -97,7 +98,7 @@ function appendSubmission(entry) {
 function isCompleteSubmission(sub) {
   return (
     sub &&
-    Number(sub.schema) === 7 &&
+    Number(sub.schema) === 8 &&
     Array.isArray(sub.answers) &&
     sub.answers.length === SLIDE_COUNT
   );
@@ -114,8 +115,8 @@ function aggregate(submissions) {
 
   for (const sub of valid) {
     for (const row of sub.answers) {
-      const idx = Number(row.image) - 1;
-      if (idx < 0 || idx >= SLIDE_COUNT) continue;
+      const idx = SLIDES.findIndex((s) => s.image === Number(row.image));
+      if (idx < 0) continue;
       const slide = SLIDES[idx];
       if (row.id !== slide.id) continue;
       const val = row.value;
@@ -126,7 +127,7 @@ function aggregate(submissions) {
   }
 
   return {
-    schema: 7,
+    schema: 8,
     totalSubmissions: valid.length,
     slides: SLIDES,
     images,
@@ -143,36 +144,30 @@ function send(res, status, body, headers = {}) {
   res.end(payload);
 }
 
-function safeJoin(base, reqPath) {
-  const decoded = decodeURIComponent(reqPath.split("?")[0]);
-  const cleaned = path.normalize(decoded).replace(/^(\.\.[/\\])+/, "");
-  const full = path.join(base, cleaned);
-  if (!full.startsWith(base)) return null;
-  return full;
+function safeJoin(root, rel) {
+  const resolved = path.normalize(path.join(root, rel));
+  if (!resolved.startsWith(root)) return null;
+  return resolved;
 }
 
 function serveFile(res, filePath) {
-  if (!filePath || !fs.existsSync(filePath) || fs.statSync(filePath).isDirectory()) {
-    send(res, 404, { error: "not found" });
-    return;
+  if (!filePath || !fs.existsSync(filePath) || !fs.statSync(filePath).isFile()) {
+    return send(res, 404, { error: "not found" });
   }
   const ext = path.extname(filePath).toLowerCase();
   const type = MIME[ext] || "application/octet-stream";
-  res.writeHead(200, { "Content-Type": type, "Cache-Control": "no-cache" });
-  fs.createReadStream(filePath).pipe(res);
+  const data = fs.readFileSync(filePath);
+  res.writeHead(200, {
+    "Content-Type": type,
+    "Cache-Control": ext === ".html" || ext === ".js" || ext === ".css" ? "no-cache" : "public, max-age=3600",
+  });
+  res.end(data);
 }
 
 function readBody(req) {
   return new Promise((resolve, reject) => {
     const chunks = [];
-    let size = 0;
     req.on("data", (chunk) => {
-      size += chunk.length;
-      if (size > 200_000) {
-        reject(new Error("body too large"));
-        req.destroy();
-        return;
-      }
       chunks.push(chunk);
     });
     req.on("end", () => resolve(Buffer.concat(chunks).toString("utf8")));
@@ -221,7 +216,7 @@ const server = http.createServer(async (req, res) => {
       if (!clean) return send(res, 400, { error: "invalid submission" });
 
       const entry = {
-        schema: 7,
+        schema: 8,
         submittedAt: new Date().toISOString(),
         answers: clean.answers,
       };
@@ -239,24 +234,21 @@ const server = http.createServer(async (req, res) => {
     }
 
     if (req.method === "GET") {
-      // Prefer root static files; fall back to legacy public/ paths
-      const rootFile = safeJoin(ROOT, pathname);
-      if (rootFile && fs.existsSync(rootFile) && !fs.statSync(rootFile).isDirectory()) {
-        return serveFile(res, rootFile);
-      }
-      const legacy = safeJoin(path.join(ROOT, "public"), pathname.replace(/^\/public/, "") || pathname);
-      return serveFile(res, legacy);
+      const rel = pathname.replace(/^\//, "") || "index.html";
+      const file = safeJoin(ROOT, rel);
+      if (file) return serveFile(res, file);
+      const pub = safeJoin(path.join(ROOT, "public"), rel);
+      if (pub) return serveFile(res, pub);
     }
 
-    send(res, 405, { error: "method not allowed" });
+    return send(res, 404, { error: "not found" });
   } catch (err) {
     console.error(err);
-    send(res, 500, { error: "server error" });
+    return send(res, 500, { error: "server error" });
   }
 });
 
 server.listen(PORT, "127.0.0.1", () => {
-  console.log(`Опрос запущен: http://127.0.0.1:${PORT}`);
-  console.log(`Картинки: ${IMAGES} (tree-1.jpg … tree-16.jpg)`);
-  console.log(`Данные:   ${DATA_FILE}`);
+  console.log(`Survey: http://127.0.0.1:${PORT}`);
+  console.log(`Картинки: ${IMAGES} (tree-1.jpg … tree-18.jpg)`);
 });

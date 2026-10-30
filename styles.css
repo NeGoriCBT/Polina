@@ -1204,6 +1204,21 @@ button {
   font-size: 0.85rem;
 }
 
+.results-extra {
+  margin-top: 1.75rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.results-extra .btn--ghost {
+  margin-top: 0;
+}
+
+a.btn {
+  text-decoration: none;
+}
+
 @media (min-width: 761px) {
   .survey-layout {
     column-gap: clamp(2rem, 4.5vw, 3rem);

@@ -1,10 +1,10 @@
 (() => {
   "use strict";
 
-  /** Same feeling question for every image (tree-1 … tree-7). */
+  /** Same feeling question for every image (tree-1 … tree-14). */
   const FEELING_OPTIONS = ["спокойствие", "тревогу", "радость", "грусть", "ничего особенного"];
-  const SLIDES = [1, 2, 3, 4, 5, 6, 7].map((image) => ({
-    image,
+  const SLIDES = Array.from({ length: 14 }, (_, i) => ({
+    image: i + 1,
     id: "feeling",
     text: "Что вы чувствуете в первую очередь?",
     options: FEELING_OPTIONS,
@@ -12,8 +12,9 @@
 
   const SLIDE_COUNT = SLIDES.length;
   const EXT_CANDIDATES = [".png", ".jpg", ".jpeg", ".webp"];
-  const STORAGE_KEY = "tree-survey-submissions-v3";
-  const LAST_KEY = "tree-survey-last";
+  const STORAGE_KEY = "tree-survey-submissions-v4";
+  const LAST_KEY = "tree-survey-last-v4";
+  const SUBMISSION_SCHEMA = 3;
 
   /** GitHub Pages has no Node API. */
   const STATIC_HOST =
@@ -117,6 +118,7 @@
   function isCompleteSubmission(sub) {
     return (
       sub &&
+      Number(sub.schema) === SUBMISSION_SCHEMA &&
       Array.isArray(sub.answers) &&
       sub.answers.length === SLIDE_COUNT &&
       sub.answers.every(
@@ -147,7 +149,7 @@
     }
 
     return {
-      schema: 2,
+      schema: SUBMISSION_SCHEMA,
       totalSubmissions: valid.length,
       images,
       source,
@@ -165,11 +167,12 @@
   async function remoteSubmit(answers) {
     const id = newSubmissionId();
     const entry = {
-      schema: 2,
+      schema: SUBMISSION_SCHEMA,
       submittedAt: new Date().toISOString(),
       answers,
     };
-    const url = `${remoteCfg.baseUrl.replace(/\/$/, "")}/${encodeURIComponent(remoteCfg.namespace)}/submissions/${encodeURIComponent(id)}`;
+    // Path prefix submissions14/ — old 7-answer rows under submissions/ are ignored.
+    const url = `${remoteCfg.baseUrl.replace(/\/$/, "")}/${encodeURIComponent(remoteCfg.namespace)}/submissions14/${encodeURIComponent(id)}`;
     const res = await fetch(url, {
       method: "POST",
       headers: {
@@ -192,7 +195,7 @@
     const entries = (data && data.entries) || {};
     const list = [];
     for (const [path, value] of Object.entries(entries)) {
-      if (!String(path).startsWith("submissions/")) continue;
+      if (!String(path).startsWith("submissions14/")) continue;
       list.push(value);
     }
     return list;
@@ -233,7 +236,7 @@
 
     const list = readLocalSubmissions();
     list.push({
-      schema: 2,
+      schema: SUBMISSION_SCHEMA,
       submittedAt: new Date().toISOString(),
       answers,
     });

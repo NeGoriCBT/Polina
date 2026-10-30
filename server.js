@@ -12,12 +12,12 @@ const DATA_DIR = path.join(ROOT, "data");
 const DATA_FILE = path.join(DATA_DIR, "submissions.json");
 // Static site lives at repo root (GitHub Pages + local npm start).
 
-const SLIDE_COUNT = 7;
+const SLIDE_COUNT = 14;
 
-/** Same feeling question for every image (tree-1 … tree-7). */
+/** Same feeling question for every image (tree-1 … tree-14). */
 const FEELING_OPTIONS = ["спокойствие", "тревогу", "радость", "грусть", "ничего особенного"];
-const SLIDES = [1, 2, 3, 4, 5, 6, 7].map((image) => ({
-  image,
+const SLIDES = Array.from({ length: SLIDE_COUNT }, (_, i) => ({
+  image: i + 1,
   id: "feeling",
   text: "Что вы чувствуете в первую очередь?",
   options: FEELING_OPTIONS,
@@ -87,7 +87,7 @@ function aggregate(submissions) {
   }
 
   return {
-    schema: 2,
+    schema: 3,
     totalSubmissions: submissions.length,
     slides: SLIDES,
     images,
@@ -182,7 +182,7 @@ const server = http.createServer(async (req, res) => {
       if (!clean) return send(res, 400, { error: "invalid submission" });
 
       const entry = {
-        schema: 2,
+        schema: 3,
         submittedAt: new Date().toISOString(),
         answers: clean.answers,
       };
@@ -218,6 +218,6 @@ const server = http.createServer(async (req, res) => {
 
 server.listen(PORT, "127.0.0.1", () => {
   console.log(`Опрос запущен: http://127.0.0.1:${PORT}`);
-  console.log(`Картинки: ${IMAGES} (tree-1.png … tree-7.png)`);
+  console.log(`Картинки: ${IMAGES} (tree-1.png … tree-14.png)`);
   console.log(`Данные:   ${DATA_FILE}`);
 });

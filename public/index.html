@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=5" />
+  <link rel="stylesheet" href="styles.css?v=6" />
 </head>
 <body>
   <main id="app">
@@ -21,7 +21,10 @@
           После каждой картинки — один и тот же вопрос: что вы чувствуете в первую очередь.
           Ответы обезличены и складываются в общую статистику.
         </p>
-        <button type="button" class="btn fade-line" style="--d:3" id="btn-start">Далее</button>
+        <div class="intro-actions fade-line" style="--d:3">
+          <button type="button" class="btn" id="btn-start">Далее</button>
+          <button type="button" class="btn btn--ghost btn--inline" id="btn-results">Результаты</button>
+        </div>
       </div>
     </section>
 
@@ -57,7 +60,7 @@
       <button type="button" class="btn btn--ghost" id="btn-again">Пройти ещё раз</button>
     </section>
   </main>
-  <script src="config.js?v=5"></script>
-  <script src="app.js?v=5"></script>
+  <script src="config.js?v=6"></script>
+  <script src="app.js?v=6"></script>
 </body>
 </html>

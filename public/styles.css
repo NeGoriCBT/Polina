@@ -126,10 +126,21 @@ button {
   margin-top: 2rem;
 }
 
+.btn--ghost.btn--inline {
+  margin-top: 0;
+}
+
 .btn--ghost:hover,
 .btn--ghost:focus-visible {
   background: var(--fg);
   color: var(--bg);
+}
+
+.intro-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
+  align-items: center;
 }
 
 /* ——— Survey ——— */

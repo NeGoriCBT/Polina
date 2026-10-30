@@ -30,6 +30,7 @@
     survey: document.getElementById("screen-survey"),
     results: document.getElementById("screen-results"),
     btnStart: document.getElementById("btn-start"),
+    btnResults: document.getElementById("btn-results"),
     btnAgain: document.getElementById("btn-again"),
     progressImage: document.getElementById("progress-image"),
     progressQuestion: document.getElementById("progress-question"),
@@ -475,6 +476,10 @@
     resetSurvey();
     showScreen("survey");
     renderSlide();
+  });
+
+  els.btnResults.addEventListener("click", () => {
+    showResults(null);
   });
 
   els.btnAgain.addEventListener("click", () => {

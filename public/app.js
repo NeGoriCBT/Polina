@@ -2,7 +2,17 @@
   "use strict";
 
   /** Same feeling question for every image (tree-1 … tree-15). */
-  const FEELING_OPTIONS = ["спокойствие", "тревогу", "радость", "грусть", "ничего особенного"];
+  const FEELING_OPTIONS = [
+    "радость",
+    "восхищение",
+    "тревога",
+    "изумление",
+    "печаль",
+    "скука",
+    "отвращение",
+    "гнев",
+    "интерес",
+  ];
   const STYLES = [
     { name: "Ренессанс", year: "~1400" },
     { name: "Барокко", year: "~1600" },
@@ -32,9 +42,9 @@
 
   const SLIDE_COUNT = SLIDES.length;
   const EXT_CANDIDATES = [".jpg", ".jpeg", ".webp", ".png"];
-  const STORAGE_KEY = "tree-survey-submissions-v5";
-  const LAST_KEY = "tree-survey-last-v5";
-  const SUBMISSION_SCHEMA = 4;
+  const STORAGE_KEY = "tree-survey-submissions-v6";
+  const LAST_KEY = "tree-survey-last-v6";
+  const SUBMISSION_SCHEMA = 5;
   /** Preloaded image URLs → HTMLImageElement (complete). */
   const imageCache = new Map();
 
@@ -221,8 +231,8 @@
       submittedAt: new Date().toISOString(),
       answers,
     };
-    // Path prefix submissions15/ — older 7/14-answer rows are ignored.
-    const url = `${remoteCfg.baseUrl.replace(/\/$/, "")}/${encodeURIComponent(remoteCfg.namespace)}/submissions15/${encodeURIComponent(id)}`;
+    // Path prefix submissions15f9/ — resets aggregates for the new 9-feeling set.
+    const url = `${remoteCfg.baseUrl.replace(/\/$/, "")}/${encodeURIComponent(remoteCfg.namespace)}/submissions15f9/${encodeURIComponent(id)}`;
     const res = await fetch(url, {
       method: "POST",
       headers: {
@@ -245,7 +255,7 @@
     const entries = (data && data.entries) || {};
     const list = [];
     for (const [path, value] of Object.entries(entries)) {
-      if (!String(path).startsWith("submissions15/")) continue;
+      if (!String(path).startsWith("submissions15f9/")) continue;
       list.push(value);
     }
     return list;

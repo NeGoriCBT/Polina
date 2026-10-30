@@ -15,7 +15,17 @@ const DATA_FILE = path.join(DATA_DIR, "submissions.json");
 const SLIDE_COUNT = 15;
 
 /** Same feeling question for every image (tree-1 … tree-15). */
-const FEELING_OPTIONS = ["спокойствие", "тревогу", "радость", "грусть", "ничего особенного"];
+const FEELING_OPTIONS = [
+  "радость",
+  "восхищение",
+  "тревога",
+  "изумление",
+  "печаль",
+  "скука",
+  "отвращение",
+  "гнев",
+  "интерес",
+];
 const STYLES = [
   { name: "Ренессанс", year: "~1400" },
   { name: "Барокко", year: "~1600" },
@@ -86,7 +96,7 @@ function appendSubmission(entry) {
 function isCompleteSubmission(sub) {
   return (
     sub &&
-    Number(sub.schema) === 4 &&
+    Number(sub.schema) === 5 &&
     Array.isArray(sub.answers) &&
     sub.answers.length === SLIDE_COUNT
   );
@@ -115,7 +125,7 @@ function aggregate(submissions) {
   }
 
   return {
-    schema: 4,
+    schema: 5,
     totalSubmissions: valid.length,
     slides: SLIDES,
     images,

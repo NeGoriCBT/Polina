@@ -264,9 +264,9 @@ button {
   display: block;
   width: 100%;
   text-align: left;
-  padding: 1rem 0.25rem;
+  padding: 0.72rem 0.25rem;
   border-bottom: 1px solid var(--line);
-  font-size: 1.02rem;
+  font-size: 0.98rem;
   color: #d8d8d8;
   transition: color 0.15s ease, padding-left 0.15s ease, background 0.15s ease;
 }

@@ -70,13 +70,33 @@
   const EXT_CANDIDATES = [".jpg", ".jpeg", ".webp", ".png"];
   const STORAGE_KEY = "tree-survey-submissions-v9";
   const LAST_KEY = "tree-survey-last-v9";
-  const MY_TREE_KEY = "tree-survey-my-tree-v1";
+  const MY_TREE_KEY = "tree-survey-my-tree-v2";
   const SUBMISSION_SCHEMA = 8;
   const REWARD_CORNERS = [
     { key: "tl", left: "0", top: "0" },
     { key: "tr", left: "-100%", top: "0" },
     { key: "bl", left: "0", top: "-100%" },
     { key: "br", left: "-100%", top: "-100%" },
+  ];
+  const FORTUNES = [
+    "Скоро тебе откроется что-то простое и светлое.",
+    "Впереди день, который запомнится хорошим чувством.",
+    "Лёгкая радость придёт сама — почти незаметно.",
+    "Всё встанет на места мягко и без спешки.",
+    "Тебя ждёт тихий знак, что всё будет хорошо.",
+    "Одно тёплое мгновение согреет весь день.",
+    "Яркий день найдёт тебя, даже если небо серое.",
+    "Ответ придёт.",
+    "Удача ждёт.",
+    "Понимание придёт тихо и без спешки.",
+    "Останется только то, что по-настоящему нужно и тепло.",
+    "Кто-то милый окажется рядом.",
+    "Приятный сюрприз найдёт тебя без лишнего шума.",
+    "Твоя попытка встретит поддержку.",
+    "Тебя заметят с добротой и улыбкой.",
+    "Всё важное сбудется.",
+    "Богатство ждёт.",
+    "Любовь ждёт.",
   ];
   /** Preloaded image URLs → HTMLImageElement (complete). */
   const imageCache = new Map();
@@ -104,6 +124,8 @@
     rewardLead: document.getElementById("reward-lead"),
     rewardFrame: document.getElementById("reward-frame"),
     rewardTree: document.getElementById("reward-tree"),
+    rewardFortune: document.getElementById("reward-fortune"),
+    rewardFortuneText: document.getElementById("reward-fortune-text"),
     rewardCaption: document.getElementById("reward-caption"),
     styleName: document.getElementById("style-name"),
     styleYear: document.getElementById("style-year"),
@@ -131,6 +153,7 @@
     storageMode: HAS_REMOTE ? "remote" : STATIC_HOST ? "local" : "server",
     pendingResultsAnswers: null,
     rewardParts: null,
+    rewardFortune: null,
     rewardTimers: new Set(),
   };
 
@@ -564,19 +587,27 @@
     return id;
   }
 
+  function pickFortune() {
+    return FORTUNES[Math.floor(Math.random() * FORTUNES.length)];
+  }
+
   function readMyTree() {
     try {
       const raw = localStorage.getItem(MY_TREE_KEY);
       if (!raw) return null;
       const data = JSON.parse(raw);
       if (!data || !Array.isArray(data.parts) || data.parts.length !== 4) return null;
+      if (!data.fortune || typeof data.fortune !== "string") {
+        data.fortune = pickFortune();
+        writeMyTree(data.parts, data.fortune);
+      }
       return data;
     } catch {
       return null;
     }
   }
 
-  function writeMyTree(parts) {
+  function writeMyTree(parts, fortune) {
     localStorage.setItem(
       MY_TREE_KEY,
       JSON.stringify({
@@ -585,9 +616,21 @@
           name: p.name,
           frame: p.frame,
         })),
+        fortune,
         at: Date.now(),
       })
     );
+  }
+
+  function showRewardFortune(text) {
+    state.rewardFortune = text;
+    if (!els.rewardFortune || !els.rewardFortuneText) return;
+    els.rewardFortune.classList.remove("is-on");
+    els.rewardFortuneText.style.animation = "none";
+    els.rewardFortuneText.textContent = text || "";
+    void els.rewardFortuneText.offsetWidth;
+    els.rewardFortuneText.style.animation = "";
+    if (text) els.rewardFortune.classList.add("is-on");
   }
 
   function styleMetaByImage(image) {
@@ -653,12 +696,27 @@
     }
   }
 
-  function paintRewardTree(parts, { animate }) {
+  function paintRewardTree(parts, fortune, { animate }) {
     if (!els.rewardTree || !els.rewardFrame) return;
     clearRewardTimers();
     els.rewardTree.replaceChildren();
-    els.rewardCaption.classList.remove("is-on");
-    els.rewardCaption.textContent = "";
+    if (els.rewardCaption) {
+      els.rewardCaption.classList.remove("is-on");
+      els.rewardCaption.style.animation = "none";
+      els.rewardCaption.textContent = "";
+      void els.rewardCaption.offsetWidth;
+      els.rewardCaption.style.animation = "";
+    }
+    if (els.rewardFortune) {
+      els.rewardFortune.classList.remove("is-on");
+      if (els.rewardFortuneText) {
+        els.rewardFortuneText.style.animation = "none";
+        els.rewardFortuneText.textContent = "";
+        void els.rewardFortuneText.offsetWidth;
+        els.rewardFortuneText.style.animation = "";
+      }
+    }
+    state.rewardFortune = fortune || null;
     els.rewardFrame.hidden = false;
     els.rewardFrame.classList.remove("is-entering");
     void els.rewardFrame.offsetWidth;
@@ -680,35 +738,50 @@
       slots.push(slot);
     });
 
-    const finishCaption = (suffix) => {
-      els.rewardCaption.textContent =
-        parts.map((p) => p.name).join(" · ") + (suffix || "");
-      els.rewardCaption.classList.add("is-on");
+    const finishText = (suffix) => {
+      if (fortune) showRewardFortune(fortune);
+      rewardLater(() => {
+        if (!els.rewardCaption) return;
+        els.rewardCaption.textContent =
+          parts.map((p) => p.name).join(" · ") + (suffix || "");
+        els.rewardCaption.classList.add("is-on");
+      }, 160);
       if (els.btnDownloadTree) els.btnDownloadTree.hidden = false;
     };
 
     if (!animate) {
-      finishCaption(" · уже получено");
+      finishText(" · уже получено");
       return;
     }
 
     slots.forEach((slot, step) => {
       rewardLater(() => slot.classList.add("is-ready"), 420 + step * 380);
     });
-    rewardLater(() => finishCaption(""), 420 + 3 * 380 + 700);
+    rewardLater(() => finishText(""), 420 + 3 * 380 + 700);
   }
 
   function resetRewardUi() {
     clearRewardTimers();
     state.rewardParts = null;
+    state.rewardFortune = null;
     if (els.rewardTree) els.rewardTree.replaceChildren();
     if (els.rewardFrame) {
       els.rewardFrame.hidden = true;
       els.rewardFrame.classList.remove("is-entering");
     }
+    if (els.rewardFortune) els.rewardFortune.classList.remove("is-on");
+    if (els.rewardFortuneText) {
+      els.rewardFortuneText.style.animation = "none";
+      els.rewardFortuneText.textContent = "";
+      void els.rewardFortuneText.offsetWidth;
+      els.rewardFortuneText.style.animation = "";
+    }
     if (els.rewardCaption) {
       els.rewardCaption.classList.remove("is-on");
+      els.rewardCaption.style.animation = "none";
       els.rewardCaption.textContent = "";
+      void els.rewardCaption.offsetWidth;
+      els.rewardCaption.style.animation = "";
     }
     if (els.btnClaimTree) {
       els.btnClaimTree.hidden = false;
@@ -729,12 +802,13 @@
     const existing = readMyTree();
     if (existing) {
       state.rewardParts = existing.parts;
+      state.rewardFortune = existing.fortune;
       if (els.rewardLead) {
         els.rewardLead.textContent =
           "Своё дерево уже получено — повторно собрать нельзя, но можно скачать.";
       }
       if (els.btnClaimTree) els.btnClaimTree.hidden = true;
-      paintRewardTree(existing.parts, { animate: false });
+      paintRewardTree(existing.parts, existing.fortune, { animate: false });
       return;
     }
 
@@ -750,16 +824,18 @@
     const parts = buildTreePartsFromAnswers(source);
     if (parts.length < 4) return;
     state.busy = true;
-    writeMyTree(parts);
+    const fortune = pickFortune();
+    writeMyTree(parts, fortune);
     state.rewardParts = parts;
+    state.rewardFortune = fortune;
     if (els.btnClaimTree) {
       els.btnClaimTree.hidden = true;
       els.btnClaimTree.disabled = true;
     }
-    paintRewardTree(parts, { animate: true });
+    paintRewardTree(parts, fortune, { animate: true });
     rewardLater(() => {
       state.busy = false;
-    }, 420 + 3 * 380 + 700);
+    }, 420 + 3 * 380 + 900);
   }
 
   function loadImage(src) {
@@ -806,14 +882,34 @@
     return well;
   }
 
-  async function buildTreeDownloadCanvas(parts) {
+  function wrapCanvasText(ctx, text, x, y, maxWidth, lineHeight) {
+    const words = String(text).split(" ");
+    let line = "";
+    let yy = y;
+    for (let i = 0; i < words.length; i += 1) {
+      const test = line ? `${line} ${words[i]}` : words[i];
+      if (ctx.measureText(test).width > maxWidth && line) {
+        ctx.fillText(line, x, yy);
+        line = words[i];
+        yy += lineHeight;
+      } else {
+        line = test;
+      }
+    }
+    if (line) ctx.fillText(line, x, yy);
+  }
+
+  async function buildTreeDownloadCanvas(parts, fortune) {
     const size = 1400;
+    const footer = fortune ? 170 : 0;
     const outer = 110;
     const matte = 48;
     const canvas = document.createElement("canvas");
     canvas.width = size;
-    canvas.height = size;
+    canvas.height = size + footer;
     const ctx = canvas.getContext("2d");
+    ctx.fillStyle = "#0a0a0a";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
     const well = drawClassicFrame(ctx, size, outer, matte);
     const inner = size - well * 2;
     const half = inner / 2;
@@ -861,18 +957,31 @@
     lamp.addColorStop(1, "rgba(0, 0, 0, 0.28)");
     ctx.fillStyle = lamp;
     ctx.fillRect(well, well, inner, inner);
+
+    if (fortune) {
+      ctx.fillStyle = "#f2f2f2";
+      ctx.textAlign = "center";
+      ctx.font = "italic 400 36px 'Cormorant Garamond', serif";
+      wrapCanvasText(ctx, fortune, size / 2, size + 70, size - 160, 44);
+      const stylesLine = parts.map((p) => p.name).join(" · ");
+      ctx.fillStyle = "#8f8f8f";
+      ctx.font = "400 22px Manrope, sans-serif";
+      wrapCanvasText(ctx, stylesLine, size / 2, size + 130, size - 160, 28);
+    }
+
     return canvas;
   }
 
   async function downloadMyTree() {
     const saved = readMyTree();
     const parts = state.rewardParts || (saved && saved.parts);
+    const fortune = state.rewardFortune || (saved && saved.fortune) || null;
     if (!parts || !els.btnDownloadTree) return;
     els.btnDownloadTree.disabled = true;
     const prev = els.btnDownloadTree.textContent;
     els.btnDownloadTree.textContent = "Сохраняю…";
     try {
-      const canvas = await buildTreeDownloadCanvas(parts);
+      const canvas = await buildTreeDownloadCanvas(parts, fortune);
       const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");

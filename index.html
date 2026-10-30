@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=29" />
+  <link rel="stylesheet" href="styles.css?v=30" />
   <link rel="preload" as="image" href="images/tree-1.jpg" />
   <link rel="preload" as="image" href="images/tree-2.jpg" />
   <link rel="preload" as="image" href="images/tree-3.jpg" />
@@ -101,7 +101,12 @@
             </div>
           </figure>
         </div>
-        <p class="reward-caption" id="reward-caption"></p>
+        <div class="reward-under">
+          <div class="reward-fortune" id="reward-fortune" aria-live="polite">
+            <p class="reward-fortune-text" id="reward-fortune-text"></p>
+          </div>
+          <p class="reward-caption" id="reward-caption"></p>
+        </div>
         <div class="reward-actions">
           <button type="button" class="btn" id="btn-claim-tree">Получить свою картину</button>
           <button type="button" class="btn btn--ghost btn--inline" id="btn-download-tree" hidden>Скачать</button>
@@ -120,7 +125,7 @@
       <p class="results-note" id="results-note">Данные обезличены. Каждый проход добавляется к общей сводке.</p>
     </section>
   </main>
-  <script src="config.js?v=29"></script>
-  <script src="app.js?v=29"></script>
+  <script src="config.js?v=30"></script>
+  <script src="app.js?v=30"></script>
 </body>
 </html>

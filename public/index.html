@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=8" />
+  <link rel="stylesheet" href="styles.css?v=9" />
 </head>
 <body>
   <main id="app">
@@ -30,16 +30,15 @@
 
     <!-- Survey -->
     <section id="screen-survey" class="screen screen--survey" hidden aria-live="polite">
-      <header class="survey-meta">
-        <span id="progress-image">Ренессанс ~1400</span>
-        <span class="dot" aria-hidden="true">·</span>
-        <span id="progress-question">1 из 14</span>
+      <header class="survey-style" aria-live="polite">
+        <h2 class="survey-style-name" id="style-name">Ренессанс</h2>
+        <span class="survey-style-year" id="style-year">~1400</span>
       </header>
       <div class="survey-layout">
         <figure class="frame" id="image-frame">
           <img id="survey-image" alt="" hidden />
           <div class="frame-placeholder" id="image-placeholder">
-            <span id="image-label">Ренессанс ~1400</span>
+            <span id="image-label">Ренессанс</span>
           </div>
         </figure>
         <div class="question-panel">
@@ -60,7 +59,7 @@
       <button type="button" class="btn btn--ghost" id="btn-again">Пройти ещё раз</button>
     </section>
   </main>
-  <script src="config.js?v=8"></script>
-  <script src="app.js?v=8"></script>
+  <script src="config.js?v=9"></script>
+  <script src="app.js?v=9"></script>
 </body>
 </html>

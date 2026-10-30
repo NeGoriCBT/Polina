@@ -16,25 +16,27 @@ const SLIDE_COUNT = 14;
 
 /** Same feeling question for every image (tree-1 … tree-14). */
 const FEELING_OPTIONS = ["спокойствие", "тревогу", "радость", "грусть", "ничего особенного"];
-const STYLE_LABELS = [
-  "Ренессанс ~1400",
-  "Барокко ~1600",
-  "Рококо ~1730",
-  "Классицизм ~1750",
-  "Импрессионизм ~1874",
-  "Фовизм ~1905",
-  "Экспрессионизм ~1905",
-  "Кубизм ~1907",
-  "Авангардизм ~1910",
-  "Абстракционизм ~1910",
-  "Супрематизм ~1915",
-  "Дадаизм ~1916",
-  "Сюрреализм ~1924",
-  "Активная живопись ~1945",
+const STYLES = [
+  { name: "Ренессанс", year: "~1400" },
+  { name: "Барокко", year: "~1600" },
+  { name: "Рококо", year: "~1730" },
+  { name: "Классицизм", year: "~1750" },
+  { name: "Импрессионизм", year: "~1874" },
+  { name: "Фовизм", year: "~1905" },
+  { name: "Экспрессионизм", year: "~1905" },
+  { name: "Кубизм", year: "~1907" },
+  { name: "Авангардизм", year: "~1910" },
+  { name: "Абстракционизм", year: "~1910" },
+  { name: "Супрематизм", year: "~1915" },
+  { name: "Дадаизм", year: "~1916" },
+  { name: "Сюрреализм", year: "~1924" },
+  { name: "Активная живопись", year: "~1945" },
 ];
-const SLIDES = STYLE_LABELS.map((label, i) => ({
+const SLIDES = STYLES.map((style, i) => ({
   image: i + 1,
-  label,
+  name: style.name,
+  year: style.year,
+  label: `${style.name} ${style.year}`,
   id: "feeling",
   text: "Что вы чувствуете в первую очередь?",
   options: FEELING_OPTIONS,

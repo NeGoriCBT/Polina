@@ -3,25 +3,27 @@
 
   /** Same feeling question for every image (tree-1 … tree-14). */
   const FEELING_OPTIONS = ["спокойствие", "тревогу", "радость", "грусть", "ничего особенного"];
-  const STYLE_LABELS = [
-    "Ренессанс ~1400",
-    "Барокко ~1600",
-    "Рококо ~1730",
-    "Классицизм ~1750",
-    "Импрессионизм ~1874",
-    "Фовизм ~1905",
-    "Экспрессионизм ~1905",
-    "Кубизм ~1907",
-    "Авангардизм ~1910",
-    "Абстракционизм ~1910",
-    "Супрематизм ~1915",
-    "Дадаизм ~1916",
-    "Сюрреализм ~1924",
-    "Активная живопись ~1945",
+  const STYLES = [
+    { name: "Ренессанс", year: "~1400" },
+    { name: "Барокко", year: "~1600" },
+    { name: "Рококо", year: "~1730" },
+    { name: "Классицизм", year: "~1750" },
+    { name: "Импрессионизм", year: "~1874" },
+    { name: "Фовизм", year: "~1905" },
+    { name: "Экспрессионизм", year: "~1905" },
+    { name: "Кубизм", year: "~1907" },
+    { name: "Авангардизм", year: "~1910" },
+    { name: "Абстракционизм", year: "~1910" },
+    { name: "Супрематизм", year: "~1915" },
+    { name: "Дадаизм", year: "~1916" },
+    { name: "Сюрреализм", year: "~1924" },
+    { name: "Активная живопись", year: "~1945" },
   ];
-  const SLIDES = STYLE_LABELS.map((label, i) => ({
+  const SLIDES = STYLES.map((style, i) => ({
     image: i + 1,
-    label,
+    name: style.name,
+    year: style.year,
+    label: `${style.name} ${style.year}`,
     id: "feeling",
     text: "Что вы чувствуете в первую очередь?",
     options: FEELING_OPTIONS,
@@ -50,8 +52,8 @@
     btnStart: document.getElementById("btn-start"),
     btnResults: document.getElementById("btn-results"),
     btnAgain: document.getElementById("btn-again"),
-    progressImage: document.getElementById("progress-image"),
-    progressQuestion: document.getElementById("progress-question"),
+    styleName: document.getElementById("style-name"),
+    styleYear: document.getElementById("style-year"),
     surveyImage: document.getElementById("survey-image"),
     imagePlaceholder: document.getElementById("image-placeholder"),
     imageLabel: document.getElementById("image-label"),
@@ -82,16 +84,16 @@
     return `images/tree-${n}${ext}`;
   }
 
-  function styleLabel(n) {
-    return (SLIDES[n - 1] && SLIDES[n - 1].label) || `Стиль ${n}`;
+  function styleFor(n) {
+    return SLIDES[n - 1] || { name: `Стиль ${n}`, year: "", label: `Стиль ${n}` };
   }
 
   function tryLoadImage(n, imgEl, placeholderEl, labelEl) {
     // Per-element generation so results-page loads don't cancel each other,
     // while rapid slide changes still drop stale callbacks.
     const loadId = (imgEl._treeLoadId = (imgEl._treeLoadId || 0) + 1);
-    const title = styleLabel(n);
-    labelEl.textContent = title;
+    const style = styleFor(n);
+    labelEl.textContent = style.name;
     imgEl.hidden = true;
     placeholderEl.hidden = false;
 
@@ -104,7 +106,7 @@
 
       const onReady = () => {
         if (loadId !== imgEl._treeLoadId) return;
-        imgEl.alt = title;
+        imgEl.alt = style.label;
         imgEl.hidden = false;
         placeholderEl.hidden = true;
       };
@@ -298,8 +300,8 @@
     const slide = SLIDES[state.slideIndex];
     const n = slide.image;
 
-    els.progressImage.textContent = slide.label;
-    els.progressQuestion.textContent = `${state.slideIndex + 1} из ${SLIDE_COUNT}`;
+    els.styleName.textContent = slide.name;
+    els.styleYear.textContent = slide.year;
     els.questionText.textContent = slide.text;
 
     tryLoadImage(n, els.surveyImage, els.imagePlaceholder, els.imageLabel);
@@ -421,15 +423,22 @@
       const ph = document.createElement("div");
       ph.className = "frame-placeholder";
       const lab = document.createElement("span");
-      lab.textContent = slide.label;
+      lab.textContent = slide.name;
       ph.appendChild(lab);
       frame.append(img, ph);
 
       const statsCol = document.createElement("div");
       statsCol.className = "result-stats";
+      const titleRow = document.createElement("div");
+      titleRow.className = "result-style";
       const h2 = document.createElement("h2");
-      h2.textContent = slide.label;
-      statsCol.appendChild(h2);
+      h2.className = "result-style-name";
+      h2.textContent = slide.name;
+      const yearEl = document.createElement("span");
+      yearEl.className = "result-style-year";
+      yearEl.textContent = slide.year;
+      titleRow.append(h2, yearEl);
+      statsCol.appendChild(titleRow);
 
       const wrap = document.createElement("div");
       wrap.className = "stat-q";

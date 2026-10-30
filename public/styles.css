@@ -152,19 +152,29 @@ button {
   margin: 0 auto;
 }
 
-.survey-meta {
+.survey-style {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
-  align-items: center;
-  font-size: 0.75rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--muted);
+  align-items: baseline;
+  gap: 0.35rem 1.1rem;
+  padding-bottom: 0.25rem;
 }
 
-.survey-meta .dot {
-  opacity: 0.5;
+.survey-style-name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(1.85rem, 4.5vw, 2.75rem);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.survey-style-year {
+  color: var(--muted);
+  font-family: var(--font-body);
+  font-size: clamp(0.95rem, 2vw, 1.15rem);
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
 }
 
 .survey-layout {
@@ -335,11 +345,27 @@ button {
   font-size: 1.25rem;
 }
 
-.result-stats h2 {
+.result-style {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.35rem 0.9rem;
   margin: 0 0 1rem;
+}
+
+.result-style-name {
+  margin: 0;
   font-family: var(--font-display);
   font-weight: 400;
   font-size: 1.5rem;
+  line-height: 1.15;
+}
+
+.result-style-year {
+  color: var(--muted);
+  font-size: 0.95rem;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
 }
 
 .stat-q {

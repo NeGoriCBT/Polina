@@ -248,29 +248,53 @@ button {
   flex: 1;
 }
 
-.frame {
+/* Survey / results ornate picture frames */
+.picture-frame {
   margin: 0;
-  aspect-ratio: 1 / 1;
   width: 100%;
   max-width: 520px;
-  border: 1px solid var(--line);
-  background: #000;
-  position: relative;
-  overflow: hidden;
   opacity: 0;
   animation: soft-in 0.55s ease forwards;
 }
 
-.frame img {
+.picture-frame--compact {
+  max-width: none;
+}
+
+.picture-frame__glass {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  background: #111;
+}
+
+.picture-frame__glass img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
 }
 
+.picture-frame__glass::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 246, 220, 0.28) 0%,
+    rgba(255, 255, 255, 0.08) 18%,
+    rgba(0, 0, 0, 0) 42%,
+    rgba(0, 0, 0, 0.18) 72%,
+    rgba(0, 0, 0, 0.42) 100%
+  );
+}
+
 .frame-placeholder {
   position: absolute;
   inset: 0;
+  z-index: 2;
   display: grid;
   place-items: center;
   padding: 1rem;
@@ -283,8 +307,226 @@ button {
 }
 
 .frame-placeholder[hidden],
-.frame img[hidden] {
+.picture-frame__glass img[hidden] {
   display: none;
+}
+
+.picture-frame--classic {
+  padding: 0.85rem;
+  background: linear-gradient(145deg, #2a241c, #1a1612 45%, #0e0c0a);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 220, 150, 0.08);
+}
+.picture-frame--classic .picture-frame__moulding {
+  padding: 0.62rem;
+  background: linear-gradient(160deg, #e0c98a 0%, #c4a35a 18%, #8a7348 42%, #3d2f1a 68%, #c4a35a 88%, #e0c98a 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 230, 170, 0.35),
+    inset 0 0 0 3px rgba(40, 28, 10, 0.45),
+    inset 0 2px 4px rgba(255, 240, 200, 0.25),
+    inset 0 -2px 5px rgba(0, 0, 0, 0.35);
+}
+.picture-frame--classic .picture-frame__lip {
+  padding: 0.2rem;
+  background: linear-gradient(180deg, #5a4a2e, #1c160e 55%, #3a2e1a);
+}
+.picture-frame--classic .picture-frame__matte {
+  padding: 0.75rem;
+  background: linear-gradient(180deg, #f7f3ea, #f3efe6);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+}
+
+.picture-frame--baroque {
+  padding: 1rem;
+  background: linear-gradient(145deg, #3a2c18, #120e0a 50%, #000);
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.55);
+}
+.picture-frame--baroque .picture-frame__moulding {
+  padding: 0.85rem;
+  background: linear-gradient(145deg, #f0d78a, #d4a84a 25%, #7a5a28 50%, #2a1c0c 70%, #e0b85a 90%, #fff0c0);
+  box-shadow:
+    inset 0 0 0 2px rgba(255, 220, 140, 0.4),
+    inset 0 0 0 5px rgba(30, 18, 5, 0.55),
+    inset 0 3px 6px rgba(255, 240, 180, 0.3);
+}
+.picture-frame--baroque .picture-frame__lip { padding: 0.26rem; background: #1a1208; }
+.picture-frame--baroque .picture-frame__matte { padding: 0.5rem; background: #efe6d4; }
+
+.picture-frame--rococo {
+  padding: 0.72rem;
+  background: linear-gradient(145deg, #3a342c, #1c1814);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+}
+.picture-frame--rococo .picture-frame__moulding {
+  padding: 0.58rem;
+  background: linear-gradient(160deg, #f5e6c8, #e8d0a0 30%, #c8b080 55%, #a89068 75%, #f0e0b8);
+  box-shadow: inset 0 0 0 1px rgba(255, 250, 230, 0.5), inset 0 0 0 3px rgba(120, 100, 70, 0.25);
+}
+.picture-frame--rococo .picture-frame__lip { padding: 0.16rem; background: #4a4030; }
+.picture-frame--rococo .picture-frame__matte { padding: 0.9rem; background: #faf6ef; }
+
+.picture-frame--classicist {
+  padding: 0.62rem;
+  background: linear-gradient(180deg, #2a2a2a, #0c0c0c);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45), inset 0 0 0 1px #3a3a3a;
+}
+.picture-frame--classicist .picture-frame__moulding {
+  padding: 0.3rem;
+  background: linear-gradient(180deg, #c4a35a, #6a5428 50%, #c4a35a);
+}
+.picture-frame--classicist .picture-frame__lip { padding: 0.12rem; background: #111; }
+.picture-frame--classicist .picture-frame__matte { padding: 0.62rem; background: #ebe6dc; }
+
+.picture-frame--impression {
+  padding: 0.4rem;
+  background: linear-gradient(160deg, #e8d9b0, #b89a62 50%, #dcc898);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+.picture-frame--impression .picture-frame__moulding { padding: 0.18rem; background: #f4ecda; }
+.picture-frame--impression .picture-frame__lip { padding: 0; background: transparent; }
+.picture-frame--impression .picture-frame__matte { padding: 0.5rem; background: #fffdf8; }
+
+.picture-frame--darkwood {
+  padding: 0.58rem;
+  background: linear-gradient(145deg, #4a3424, #1a100a 55%, #0a0604);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 200, 140, 0.08);
+}
+.picture-frame--darkwood .picture-frame__moulding {
+  padding: 0.3rem;
+  background: linear-gradient(180deg, #5a4030, #2a1810);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.4);
+}
+.picture-frame--darkwood .picture-frame__lip { padding: 0.1rem; background: #0a0806; }
+.picture-frame--darkwood .picture-frame__matte { padding: 0.3rem; background: #1a1a1a; }
+
+.picture-frame--black {
+  padding: 0.4rem;
+  background: linear-gradient(180deg, #3a3a3a 0%, #2c2c2c 28%, #1e1e1e 65%, #141414 100%);
+  box-shadow:
+    0 10px 28px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.45);
+}
+.picture-frame--black .picture-frame__moulding {
+  padding: 0.26rem;
+  background: linear-gradient(180deg, #484848 0%, #303030 40%, #1a1a1a 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), inset 0 -1px 2px rgba(0, 0, 0, 0.4);
+}
+.picture-frame--black .picture-frame__lip { padding: 0.1rem; background: linear-gradient(180deg, #2a2a2a, #101010); }
+.picture-frame--black .picture-frame__matte { padding: 0; background: transparent; }
+.picture-frame--black .picture-frame__glass::after {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 246, 220, 0.16) 0%,
+    rgba(255, 255, 255, 0.04) 16%,
+    rgba(0, 0, 0, 0) 40%,
+    rgba(0, 0, 0, 0.24) 72%,
+    rgba(0, 0, 0, 0.48) 100%
+  );
+}
+
+.picture-frame--gallery {
+  padding: 0.48rem;
+  background: linear-gradient(180deg, #f7f7f7 0%, #ebebeb 55%, #d8d8d8 100%);
+  box-shadow:
+    0 12px 32px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.85),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.08);
+}
+.picture-frame--gallery .picture-frame__moulding {
+  padding: 0.12rem;
+  background: linear-gradient(180deg, #ffffff, #f0f0f0 70%, #e2e2e2);
+}
+.picture-frame--gallery .picture-frame__lip { padding: 0; background: transparent; }
+.picture-frame--gallery .picture-frame__matte {
+  padding: 0.75rem;
+  background: linear-gradient(180deg, #ffffff, #f3f3f3 100%);
+}
+
+.picture-frame--suprematist {
+  padding: 0.2rem;
+  background: linear-gradient(180deg, #ffffff 0%, #f2f2f2 50%, #dcdcdc 100%);
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -1px 3px rgba(0, 0, 0, 0.1);
+}
+.picture-frame--suprematist .picture-frame__moulding,
+.picture-frame--suprematist .picture-frame__lip,
+.picture-frame--suprematist .picture-frame__matte {
+  padding: 0;
+  background: transparent;
+}
+
+.picture-frame--dada {
+  padding: 0.62rem;
+  background: linear-gradient(145deg, #bca886 0%, #8f7a55 45%, #6a5738 100%);
+  box-shadow:
+    0 12px 30px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 240, 200, 0.2),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.25);
+}
+.picture-frame--dada .picture-frame__moulding {
+  padding: 0.35rem;
+  background: linear-gradient(180deg, #d2c09a, #9a845e 50%, #7a6542);
+  box-shadow: inset 0 0 0 1px rgba(255, 235, 190, 0.25), inset 0 0 0 2px rgba(60, 45, 25, 0.2);
+}
+.picture-frame--dada .picture-frame__lip { padding: 0.15rem; background: linear-gradient(180deg, #4a3c28, #1e1810); }
+.picture-frame--dada .picture-frame__matte {
+  padding: 0.4rem;
+  background: #e8e0d0;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+}
+
+.picture-frame--surreal {
+  padding: 0.8rem;
+  background: linear-gradient(145deg, #2a241c, #1a1612 45%, #0e0c0a);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 220, 150, 0.08);
+}
+.picture-frame--surreal .picture-frame__moulding {
+  padding: 0.58rem;
+  background: linear-gradient(160deg, #dcc070 0%, #b89248 22%, #7a5e32 48%, #2e220f 72%, #b89248 90%, #e2c888 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 230, 170, 0.3),
+    inset 0 0 0 3px rgba(40, 28, 10, 0.45),
+    inset 0 2px 4px rgba(255, 240, 200, 0.2),
+    inset 0 -2px 5px rgba(0, 0, 0, 0.35);
+}
+.picture-frame--surreal .picture-frame__lip { padding: 0.2rem; background: linear-gradient(180deg, #4a3a22, #14100a 55%, #2a2014); }
+.picture-frame--surreal .picture-frame__matte {
+  padding: 0.68rem;
+  background: linear-gradient(180deg, #ebe4d6, #ddd4c4);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+}
+
+.picture-frame--action {
+  padding: 0.95rem;
+  background: linear-gradient(180deg, #fafafa 0%, #ececec 55%, #d6d6d6 100%);
+  box-shadow:
+    0 14px 36px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -2px 5px rgba(0, 0, 0, 0.08);
+}
+.picture-frame--action .picture-frame__moulding { padding: 0.08rem; background: linear-gradient(180deg, #f0f0f0, #dddddd); }
+.picture-frame--action .picture-frame__lip { padding: 0; background: transparent; }
+.picture-frame--action .picture-frame__matte {
+  padding: 1rem;
+  background: linear-gradient(180deg, #ffffff, #f2f2f2);
+}
+
+.picture-frame--minimal {
+  padding: 0.1rem;
+  background: linear-gradient(180deg, #7a7a7a, #4a4a4a);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+}
+.picture-frame--minimal .picture-frame__moulding,
+.picture-frame--minimal .picture-frame__lip,
+.picture-frame--minimal .picture-frame__matte {
+  padding: 0;
+  background: transparent;
+}
+
+.picture-frame--compact .frame-placeholder {
+  font-size: 1.15rem;
 }
 
 .question-panel {
@@ -511,25 +753,6 @@ button {
   animation-delay: calc(var(--i, 0) * 0.08s);
 }
 
-.result-frame {
-  margin: 0;
-  aspect-ratio: 1 / 1;
-  border: 1px solid var(--line);
-  background: #000;
-  position: relative;
-  overflow: hidden;
-}
-
-.result-frame img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.result-frame .frame-placeholder {
-  font-size: 1.25rem;
-}
 
 .result-style {
   display: flex;
@@ -626,7 +849,7 @@ button {
     min-height: 0;
   }
 
-  .frame {
+  .picture-frame {
     max-width: none;
   }
 
@@ -637,7 +860,7 @@ button {
 
 @media (prefers-reduced-motion: reduce) {
   .fade-line,
-  .frame,
+  .picture-frame,
   .question-panel,
   .result-block,
   .bar-fill {

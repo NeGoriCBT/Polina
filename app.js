@@ -17,26 +17,42 @@
   const FEELING_MID = 4;
   const FEELING_LAST = FEELING_OPTIONS.length - 1;
   const STYLES = [
-    { name: "Ренессанс", year: "~1400" },
-    { name: "Барокко", year: "~1600" },
-    { name: "Рококо", year: "~1730" },
-    { name: "Классицизм", year: "~1750" },
-    { name: "Импрессионизм", year: "~1874" },
-    { name: "Фовизм", year: "~1905" },
-    { name: "Экспрессионизм", year: "~1905" },
-    { name: "Кубизм", year: "~1907" },
-    { name: "Авангардизм", year: "~1910" },
-    { name: "Абстракционизм", year: "~1910" },
-    { name: "Супрематизм", year: "~1915" },
-    { name: "Дадаизм", year: "~1916" },
-    { name: "Сюрреализм", year: "~1924" },
-    { name: "Активная живопись", year: "~1945" },
-    { name: "Минимализм", year: "~1960" },
+    { name: "Ренессанс", year: "~1400", frame: "classic" },
+    { name: "Барокко", year: "~1600", frame: "baroque" },
+    { name: "Рококо", year: "~1730", frame: "rococo" },
+    { name: "Классицизм", year: "~1750", frame: "classicist" },
+    { name: "Импрессионизм", year: "~1874", frame: "impression" },
+    { name: "Фовизм", year: "~1905", frame: "darkwood" },
+    { name: "Экспрессионизм", year: "~1905", frame: "darkwood" },
+    { name: "Кубизм", year: "~1907", frame: "black" },
+    { name: "Авангардизм", year: "~1910", frame: "black" },
+    { name: "Абстракционизм", year: "~1910", frame: "gallery" },
+    { name: "Супрематизм", year: "~1915", frame: "suprematist" },
+    { name: "Дадаизм", year: "~1916", frame: "dada" },
+    { name: "Сюрреализм", year: "~1924", frame: "surreal" },
+    { name: "Активная живопись", year: "~1945", frame: "action" },
+    { name: "Минимализм", year: "~1960", frame: "minimal" },
+  ];
+  const FRAME_TYPES = [
+    "classic",
+    "baroque",
+    "rococo",
+    "classicist",
+    "impression",
+    "darkwood",
+    "black",
+    "gallery",
+    "suprematist",
+    "dada",
+    "surreal",
+    "action",
+    "minimal",
   ];
   const SLIDES = STYLES.map((style, i) => ({
     image: i + 1,
     name: style.name,
     year: style.year,
+    frame: style.frame,
     label: `${style.name} ${style.year}`,
     id: "feeling",
     text: "Что вы чувствуете в первую очередь?",
@@ -107,7 +123,45 @@
   }
 
   function styleFor(n) {
-    return SLIDES[n - 1] || { name: `Стиль ${n}`, year: "", label: `Стиль ${n}` };
+    return SLIDES[n - 1] || { name: `Стиль ${n}`, year: "", label: `Стиль ${n}`, frame: "classic" };
+  }
+
+  function setPictureFrame(el, frameType) {
+    if (!el) return;
+    const type = FRAME_TYPES.includes(frameType) ? frameType : "classic";
+    el.classList.add("picture-frame");
+    for (const t of FRAME_TYPES) {
+      el.classList.toggle(`picture-frame--${t}`, t === type);
+    }
+  }
+
+  function buildPictureFrame(frameType) {
+    const figure = document.createElement("figure");
+    figure.className = "picture-frame picture-frame--compact";
+    setPictureFrame(figure, frameType);
+
+    const moulding = document.createElement("div");
+    moulding.className = "picture-frame__moulding";
+    const lip = document.createElement("div");
+    lip.className = "picture-frame__lip";
+    const matte = document.createElement("div");
+    matte.className = "picture-frame__matte";
+    const glass = document.createElement("div");
+    glass.className = "picture-frame__glass";
+
+    const img = document.createElement("img");
+    img.hidden = true;
+    img.alt = "";
+    const ph = document.createElement("div");
+    ph.className = "frame-placeholder";
+    const lab = document.createElement("span");
+    ph.appendChild(lab);
+    glass.append(img, ph);
+    matte.appendChild(glass);
+    lip.appendChild(matte);
+    moulding.appendChild(lip);
+    figure.appendChild(moulding);
+    return { figure, img, ph, lab };
   }
 
   function preferredImageUrl(n) {
@@ -380,10 +434,11 @@
     els.styleYear.textContent = slide.year;
     els.questionText.textContent = slide.text;
 
+    const frame = document.getElementById("image-frame");
+    setPictureFrame(frame, slide.frame);
     showImage(n, els.surveyImage, els.imagePlaceholder, els.imageLabel);
 
     const panel = document.querySelector(".question-panel");
-    const frame = document.getElementById("image-frame");
     if (panel) {
       panel.style.animation = "none";
       void panel.offsetWidth;
@@ -484,17 +539,8 @@
       block.className = "result-block";
       block.style.setProperty("--i", String(i));
 
-      const frame = document.createElement("figure");
-      frame.className = "result-frame";
-      const img = document.createElement("img");
-      img.hidden = true;
-      img.alt = "";
-      const ph = document.createElement("div");
-      ph.className = "frame-placeholder";
-      const lab = document.createElement("span");
+      const { figure, img, ph, lab } = buildPictureFrame(slide.frame);
       lab.textContent = slide.name;
-      ph.appendChild(lab);
-      frame.append(img, ph);
 
       const statsCol = document.createElement("div");
       statsCol.className = "result-stats";
@@ -551,7 +597,7 @@
 
       wrap.appendChild(rows);
       statsCol.appendChild(wrap);
-      block.append(frame, statsCol);
+      block.append(figure, statsCol);
       els.resultsGrid.appendChild(block);
       showImage(slide.image, img, ph, lab);
     }

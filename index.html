@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=14" />
+  <link rel="stylesheet" href="styles.css?v=15" />
   <link rel="preload" as="image" href="images/tree-1.jpg" />
   <link rel="preload" as="image" href="images/tree-2.jpg" />
   <link rel="preload" as="image" href="images/tree-3.jpg" />
@@ -58,10 +58,18 @@
         <span class="survey-style-year" id="style-year">~1400</span>
       </header>
       <div class="survey-layout">
-        <figure class="frame" id="image-frame">
-          <img id="survey-image" alt="" hidden />
-          <div class="frame-placeholder" id="image-placeholder">
-            <span id="image-label">Ренессанс</span>
+        <figure class="picture-frame picture-frame--classic" id="image-frame">
+          <div class="picture-frame__moulding">
+            <div class="picture-frame__lip">
+              <div class="picture-frame__matte">
+                <div class="picture-frame__glass">
+                  <img id="survey-image" alt="" hidden />
+                  <div class="frame-placeholder" id="image-placeholder">
+                    <span id="image-label">Ренессанс</span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </figure>
         <div class="question-panel">
@@ -98,7 +106,7 @@
       <button type="button" class="btn btn--ghost" id="btn-again">Пройти ещё раз</button>
     </section>
   </main>
-  <script src="config.js?v=14"></script>
-  <script src="app.js?v=14"></script>
+  <script src="config.js?v=15"></script>
+  <script src="app.js?v=15"></script>
 </body>
 </html>

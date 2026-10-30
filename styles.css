@@ -663,6 +663,37 @@ button {
   letter-spacing: -0.01em;
 }
 
+.feeling-list {
+  display: none;
+  flex-direction: column;
+  gap: 0;
+  border-top: 1px solid var(--line);
+  margin-bottom: 0.25rem;
+}
+
+.feeling-option {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 0.62rem 0.15rem;
+  border-bottom: 1px solid var(--line);
+  font-size: 0.95rem;
+  color: #d0d0d0;
+  transition: color 0.15s ease, padding-left 0.15s ease, background 0.15s ease;
+}
+
+.feeling-option:hover,
+.feeling-option:focus-visible {
+  color: var(--fg);
+  padding-left: 0.4rem;
+  background: var(--hover);
+  outline: none;
+}
+
+.feeling-option.is-chosen {
+  color: var(--fg);
+}
+
 .feeling-picker {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
@@ -947,6 +978,21 @@ button {
   font-size: 0.85rem;
 }
 
+@media (min-width: 761px) {
+  .feeling-list {
+    display: flex;
+  }
+
+  .feeling-picker,
+  .feeling-confirm {
+    display: none;
+  }
+
+  .question-panel {
+    max-width: 20rem;
+  }
+}
+
 @media (max-width: 760px) {
   .survey-layout,
   .result-block {
@@ -960,6 +1006,10 @@ button {
 
   .picture-frame {
     max-width: none;
+  }
+
+  .feeling-list {
+    display: none;
   }
 
   .question-text {

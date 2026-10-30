@@ -103,6 +103,7 @@
     feelingPrev: document.getElementById("feeling-prev"),
     feelingNext: document.getElementById("feeling-next"),
     feelingConfirm: document.getElementById("feeling-confirm"),
+    feelingList: document.getElementById("feeling-list"),
     resultsSub: document.getElementById("results-sub"),
     resultsGrid: document.getElementById("results-grid"),
     resultsNote: document.getElementById("results-note"),
@@ -468,6 +469,26 @@
     }
 
     setFeelingIndex(FEELING_MID, false);
+    if (els.feelingList) {
+      for (const btn of els.feelingList.querySelectorAll(".feeling-option")) {
+        btn.classList.remove("is-chosen");
+        btn.disabled = false;
+      }
+    }
+  }
+
+  function renderFeelingList() {
+    if (!els.feelingList) return;
+    els.feelingList.replaceChildren();
+    for (const opt of FEELING_OPTIONS) {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "feeling-option";
+      btn.setAttribute("role", "option");
+      btn.textContent = opt;
+      btn.addEventListener("click", () => onChoose(opt));
+      els.feelingList.appendChild(btn);
+    }
   }
 
   async function onChoose(value) {
@@ -478,11 +499,17 @@
     state.answers.push({ image: slide.image, id: slide.id, value });
 
     els.feelingValue.classList.add("is-chosen");
-    els.feelingConfirm.disabled = true;
+    if (els.feelingConfirm) els.feelingConfirm.disabled = true;
+    if (els.feelingList) {
+      for (const btn of els.feelingList.querySelectorAll(".feeling-option")) {
+        btn.disabled = true;
+        if (btn.textContent === value) btn.classList.add("is-chosen");
+      }
+    }
 
     await wait(180);
 
-    els.feelingConfirm.disabled = false;
+    if (els.feelingConfirm) els.feelingConfirm.disabled = false;
     els.feelingValue.classList.remove("is-chosen");
 
     if (state.slideIndex < SLIDE_COUNT - 1) {
@@ -697,5 +724,6 @@
     }
   });
 
+  renderFeelingList();
   prefetchImages();
 })();

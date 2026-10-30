@@ -16,15 +16,15 @@ const SLIDE_COUNT = 15;
 
 /** Same feeling question for every image (tree-1 … tree-15). */
 const FEELING_OPTIONS = [
-  "радость",
-  "восхищение",
-  "тревога",
-  "изумление",
-  "печаль",
-  "скука",
-  "отвращение",
-  "гнев",
-  "интерес",
+  "Вдохновение",
+  "Радость",
+  "Умиротворение",
+  "Интерес",
+  "Спокойствие",
+  "Равнодушие",
+  "Грусть",
+  "Тревога",
+  "Раздражение",
 ];
 const STYLES = [
   { name: "Ренессанс", year: "~1400" },
@@ -96,7 +96,7 @@ function appendSubmission(entry) {
 function isCompleteSubmission(sub) {
   return (
     sub &&
-    Number(sub.schema) === 5 &&
+    Number(sub.schema) === 6 &&
     Array.isArray(sub.answers) &&
     sub.answers.length === SLIDE_COUNT
   );
@@ -125,7 +125,7 @@ function aggregate(submissions) {
   }
 
   return {
-    schema: 5,
+    schema: 6,
     totalSubmissions: valid.length,
     slides: SLIDES,
     images,
@@ -220,7 +220,7 @@ const server = http.createServer(async (req, res) => {
       if (!clean) return send(res, 400, { error: "invalid submission" });
 
       const entry = {
-        schema: 5,
+        schema: 6,
         submittedAt: new Date().toISOString(),
         answers: clean.answers,
       };

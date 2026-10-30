@@ -316,34 +316,157 @@ button {
   letter-spacing: -0.01em;
 }
 
-.options {
+.feeling-picker {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: clamp(0.45rem, 2vw, 1rem);
+  max-width: 100%;
+  margin-bottom: 1.75rem;
+}
+
+.feeling-core {
   display: flex;
   flex-direction: column;
-  gap: 0;
-  border-top: 1px solid var(--line);
+  align-items: stretch;
+  gap: 0.55rem;
+  min-width: 0;
 }
 
-.option {
+.feeling-value {
+  margin: 0;
+  min-height: 1.1em;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(2rem, 5.5vw, 2.85rem);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  text-align: center;
+  white-space: nowrap;
+  transition: opacity 0.12s ease;
+}
+
+.feeling-value.is-flip {
+  opacity: 0;
+}
+
+.feeling-value.is-chosen {
+  opacity: 1;
+}
+
+.feeling-slider-wrap {
+  position: relative;
+  width: 100%;
+  height: 1.35rem;
+}
+
+.feeling-slider-wrap::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 2px;
+  background: var(--fg);
+}
+
+.feeling-slider-mark {
+  position: absolute;
+  top: 2px;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-left: 9px solid transparent;
+  border-right: 9px solid transparent;
+  border-top: 12px solid var(--fg);
+  transform: translateX(-50%);
+  pointer-events: none;
+  transition: left 0.12s ease;
+}
+
+.feeling-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  background: transparent;
+  outline: none;
+  cursor: pointer;
+}
+
+.feeling-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 28px;
+  height: 28px;
+  opacity: 0;
+  cursor: grab;
+}
+
+.feeling-slider::-moz-range-thumb {
+  width: 28px;
+  height: 28px;
+  opacity: 0;
+  border: 0;
+  background: transparent;
+  cursor: grab;
+}
+
+.feeling-slider::-moz-range-track {
+  background: transparent;
+  border: 0;
+}
+
+.feeling-arrow {
+  align-self: stretch;
+  display: grid;
+  place-items: center;
+  width: clamp(2rem, 6vw, 3rem);
+  color: var(--fg);
+  transition: opacity 0.15s ease, color 0.15s ease;
+  user-select: none;
+  padding: 0;
+}
+
+.feeling-arrow svg {
   display: block;
   width: 100%;
-  text-align: left;
-  padding: 0.72rem 0.25rem;
-  border-bottom: 1px solid var(--line);
-  font-size: 0.98rem;
-  color: #d8d8d8;
-  transition: color 0.15s ease, padding-left 0.15s ease, background 0.15s ease;
+  height: clamp(4.2rem, 14vw, 6.5rem);
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.6;
+  stroke-linecap: square;
+  stroke-linejoin: miter;
 }
 
-.option:hover,
-.option:focus-visible {
-  color: var(--fg);
-  padding-left: 0.5rem;
-  background: var(--hover);
+.feeling-arrow:hover,
+.feeling-arrow:focus-visible {
+  color: #fff;
   outline: none;
 }
 
-.option.is-chosen {
-  color: var(--fg);
+.feeling-arrow:disabled {
+  opacity: 0.22;
+  cursor: default;
+}
+
+.feeling-confirm {
+  margin-top: 0;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* ——— Results ——— */

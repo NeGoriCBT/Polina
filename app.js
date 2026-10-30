@@ -1,18 +1,21 @@
 (() => {
   "use strict";
 
-  /** Same feeling question for every image (tree-1 … tree-15). */
+  /** Same feeling question for every image (tree-1 … tree-15).
+   *  Left = lighter/calmer → center Спокойствие → right = heavier/sadder. */
   const FEELING_OPTIONS = [
-    "радость",
-    "восхищение",
-    "тревога",
-    "изумление",
-    "печаль",
-    "скука",
-    "отвращение",
-    "гнев",
-    "интерес",
+    "Вдохновение",
+    "Радость",
+    "Умиротворение",
+    "Интерес",
+    "Спокойствие",
+    "Равнодушие",
+    "Грусть",
+    "Тревога",
+    "Раздражение",
   ];
+  const FEELING_MID = 4;
+  const FEELING_LAST = FEELING_OPTIONS.length - 1;
   const STYLES = [
     { name: "Ренессанс", year: "~1400" },
     { name: "Барокко", year: "~1600" },
@@ -42,9 +45,9 @@
 
   const SLIDE_COUNT = SLIDES.length;
   const EXT_CANDIDATES = [".jpg", ".jpeg", ".webp", ".png"];
-  const STORAGE_KEY = "tree-survey-submissions-v6";
-  const LAST_KEY = "tree-survey-last-v6";
-  const SUBMISSION_SCHEMA = 5;
+  const STORAGE_KEY = "tree-survey-submissions-v7";
+  const LAST_KEY = "tree-survey-last-v7";
+  const SUBMISSION_SCHEMA = 6;
   /** Preloaded image URLs → HTMLImageElement (complete). */
   const imageCache = new Map();
 
@@ -71,13 +74,19 @@
     imagePlaceholder: document.getElementById("image-placeholder"),
     imageLabel: document.getElementById("image-label"),
     questionText: document.getElementById("question-text"),
-    options: document.getElementById("options"),
+    feelingValue: document.getElementById("feeling-value"),
+    feelingMark: document.getElementById("feeling-mark"),
+    feelingSlider: document.getElementById("feeling-slider"),
+    feelingPrev: document.getElementById("feeling-prev"),
+    feelingNext: document.getElementById("feeling-next"),
+    feelingConfirm: document.getElementById("feeling-confirm"),
     resultsSub: document.getElementById("results-sub"),
     resultsGrid: document.getElementById("results-grid"),
     resultsNote: document.getElementById("results-note"),
   };
 
   const state = {
+    feelingIndex: FEELING_MID,
     slideIndex: 0,
     answers: [],
     busy: false,
@@ -231,8 +240,8 @@
       submittedAt: new Date().toISOString(),
       answers,
     };
-    // Path prefix submissions15f9/ — resets aggregates for the new 9-feeling set.
-    const url = `${remoteCfg.baseUrl.replace(/\/$/, "")}/${encodeURIComponent(remoteCfg.namespace)}/submissions15f9/${encodeURIComponent(id)}`;
+    // Path prefix submissions15slider/ — resets aggregates for the slider feeling set.
+    const url = `${remoteCfg.baseUrl.replace(/\/$/, "")}/${encodeURIComponent(remoteCfg.namespace)}/submissions15slider/${encodeURIComponent(id)}`;
     const res = await fetch(url, {
       method: "POST",
       headers: {
@@ -255,7 +264,7 @@
     const entries = (data && data.entries) || {};
     const list = [];
     for (const [path, value] of Object.entries(entries)) {
-      if (!String(path).startsWith("submissions15f9/")) continue;
+      if (!String(path).startsWith("submissions15slider/")) continue;
       list.push(value);
     }
     return list;
@@ -332,6 +341,37 @@
     return aggregateSubmissions(readLocalSubmissions(), "local");
   }
 
+  function markFeelingPos(i) {
+    const t = FEELING_LAST === 0 ? 0.5 : i / FEELING_LAST;
+    els.feelingMark.style.left = `calc(${t} * (100% - 18px) + 9px)`;
+  }
+
+  function setFeelingIndex(nextIndex, animate) {
+    const i = Math.max(0, Math.min(FEELING_LAST, Number(nextIndex) || 0));
+    const next = FEELING_OPTIONS[i];
+    state.feelingIndex = i;
+    els.feelingSlider.value = String(i);
+    markFeelingPos(i);
+    els.feelingPrev.disabled = i === 0;
+    els.feelingNext.disabled = i === FEELING_LAST;
+
+    if (!animate || els.feelingValue.textContent === next) {
+      els.feelingValue.textContent = next;
+      els.feelingValue.classList.remove("is-flip");
+      return;
+    }
+    els.feelingValue.classList.add("is-flip");
+    window.setTimeout(() => {
+      els.feelingValue.textContent = next;
+      els.feelingValue.classList.remove("is-flip");
+    }, 100);
+  }
+
+  function stepFeeling(delta) {
+    if (state.busy || els.survey.hidden) return;
+    setFeelingIndex(state.feelingIndex + delta, true);
+  }
+
   function renderSlide() {
     const slide = SLIDES[state.slideIndex];
     const n = slide.image;
@@ -355,17 +395,7 @@
       frame.style.animation = "";
     }
 
-    els.options.replaceChildren();
-    for (const opt of slide.options) {
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "option";
-      btn.textContent = opt;
-      btn.setAttribute("role", "radio");
-      btn.setAttribute("aria-checked", "false");
-      btn.addEventListener("click", () => onChoose(opt));
-      els.options.appendChild(btn);
-    }
+    setFeelingIndex(FEELING_MID, false);
   }
 
   async function onChoose(value) {
@@ -375,10 +405,13 @@
     const slide = SLIDES[state.slideIndex];
     state.answers.push({ image: slide.image, id: slide.id, value });
 
-    const chosen = [...els.options.querySelectorAll(".option")].find((b) => b.textContent === value);
-    if (chosen) chosen.classList.add("is-chosen");
+    els.feelingValue.classList.add("is-chosen");
+    els.feelingConfirm.disabled = true;
 
     await wait(180);
+
+    els.feelingConfirm.disabled = false;
+    els.feelingValue.classList.remove("is-chosen");
 
     if (state.slideIndex < SLIDE_COUNT - 1) {
       state.slideIndex += 1;
@@ -528,6 +561,7 @@
     state.slideIndex = 0;
     state.answers = [];
     state.busy = false;
+    state.feelingIndex = FEELING_MID;
   }
 
   function wait(ms) {
@@ -553,6 +587,30 @@
       }
     }
   }
+
+  els.feelingSlider.addEventListener("input", () => {
+    if (state.busy || els.survey.hidden) return;
+    setFeelingIndex(els.feelingSlider.value, true);
+  });
+  els.feelingPrev.addEventListener("click", () => stepFeeling(-1));
+  els.feelingNext.addEventListener("click", () => stepFeeling(1));
+  els.feelingConfirm.addEventListener("click", () => {
+    onChoose(FEELING_OPTIONS[state.feelingIndex]);
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (els.survey.hidden || state.busy) return;
+    if (e.key === "ArrowLeft") {
+      e.preventDefault();
+      stepFeeling(-1);
+    } else if (e.key === "ArrowRight") {
+      e.preventDefault();
+      stepFeeling(1);
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      onChoose(FEELING_OPTIONS[state.feelingIndex]);
+    }
+  });
 
   els.btnStart.addEventListener("click", () => {
     resetSurvey();

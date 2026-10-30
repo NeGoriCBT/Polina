@@ -7,10 +7,10 @@ const { URL } = require("url");
 
 const PORT = Number(process.env.PORT) || 3847;
 const ROOT = __dirname;
-const PUBLIC = path.join(ROOT, "public");
 const IMAGES = path.join(ROOT, "images");
 const DATA_DIR = path.join(ROOT, "data");
 const DATA_FILE = path.join(DATA_DIR, "submissions.json");
+// Static site lives at repo root (GitHub Pages + local npm start).
 
 const SLIDE_COUNT = 7;
 
@@ -228,7 +228,7 @@ const server = http.createServer(async (req, res) => {
     }
 
     if (req.method === "GET" && (pathname === "/" || pathname === "/index.html")) {
-      return serveFile(res, path.join(PUBLIC, "index.html"));
+      return serveFile(res, path.join(ROOT, "index.html"));
     }
 
     if (req.method === "GET" && pathname.startsWith("/images/")) {
@@ -237,8 +237,13 @@ const server = http.createServer(async (req, res) => {
     }
 
     if (req.method === "GET") {
-      const file = safeJoin(PUBLIC, pathname);
-      return serveFile(res, file);
+      // Prefer root static files; fall back to legacy public/ paths
+      const rootFile = safeJoin(ROOT, pathname);
+      if (rootFile && fs.existsSync(rootFile) && !fs.statSync(rootFile).isDirectory()) {
+        return serveFile(res, rootFile);
+      }
+      const legacy = safeJoin(path.join(ROOT, "public"), pathname.replace(/^\/public/, "") || pathname);
+      return serveFile(res, legacy);
     }
 
     send(res, 405, { error: "method not allowed" });

@@ -49,6 +49,8 @@
 
   const SLIDE_COUNT = SLIDES.length;
   const EXT_CANDIDATES = [".png", ".jpg", ".jpeg", ".webp"];
+  const STORAGE_KEY = "tree-survey-submissions-v2";
+  const LAST_KEY = "tree-survey-last";
 
   const els = {
     intro: document.getElementById("screen-intro"),
@@ -65,12 +67,14 @@
     options: document.getElementById("options"),
     resultsSub: document.getElementById("results-sub"),
     resultsGrid: document.getElementById("results-grid"),
+    resultsNote: document.getElementById("results-note"),
   };
 
   const state = {
     slideIndex: 0,
     answers: [],
     busy: false,
+    storageMode: "server", // "server" | "local"
   };
 
   function showScreen(name) {
@@ -83,7 +87,8 @@
   }
 
   function imageUrl(n, ext) {
-    return `/images/tree-${n}${ext}`;
+    // Relative path so GitHub Pages under /Polina/ works
+    return `images/tree-${n}${ext}`;
   }
 
   function tryLoadImage(n, imgEl, placeholderEl, labelEl) {
@@ -107,6 +112,85 @@
       probe.src = imageUrl(n, ext);
     };
     tryNext();
+  }
+
+  function readLocalSubmissions() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      const data = raw ? JSON.parse(raw) : [];
+      return Array.isArray(data) ? data : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function writeLocalSubmissions(list) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+  }
+
+  function aggregateLocal(submissions) {
+    const images = SLIDES.map((slide) => ({
+      image: slide.image,
+      label: `Стиль ${slide.image}`,
+      question: { id: slide.id, text: slide.text, options: slide.options },
+      counts: Object.fromEntries(slide.options.map((o) => [o, 0])),
+    }));
+
+    for (const sub of submissions) {
+      if (!sub || !Array.isArray(sub.answers)) continue;
+      for (const row of sub.answers) {
+        const idx = Number(row.image) - 1;
+        if (idx < 0 || idx >= SLIDE_COUNT) continue;
+        const slide = SLIDES[idx];
+        if (row.id !== slide.id) continue;
+        if (typeof row.value === "string" && Object.prototype.hasOwnProperty.call(images[idx].counts, row.value)) {
+          images[idx].counts[row.value] += 1;
+        }
+      }
+    }
+
+    return {
+      schema: 2,
+      totalSubmissions: submissions.length,
+      images,
+      source: "local",
+    };
+  }
+
+  async function submitAnswers(answers) {
+    try {
+      const res = await fetch("api/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ answers }),
+      });
+      if (!res.ok) throw new Error("submit failed");
+      state.storageMode = "server";
+      return { ok: true, mode: "server" };
+    } catch {
+      const list = readLocalSubmissions();
+      list.push({
+        schema: 2,
+        submittedAt: new Date().toISOString(),
+        answers,
+      });
+      writeLocalSubmissions(list);
+      state.storageMode = "local";
+      return { ok: true, mode: "local", totalSubmissions: list.length };
+    }
+  }
+
+  async function loadStats() {
+    try {
+      const res = await fetch("api/stats");
+      if (!res.ok) throw new Error("stats failed");
+      const stats = await res.json();
+      state.storageMode = "server";
+      return stats;
+    } catch {
+      state.storageMode = "local";
+      return aggregateLocal(readLocalSubmissions());
+    }
   }
 
   function renderSlide() {
@@ -168,22 +252,10 @@
   }
 
   async function finishSurvey() {
-    try {
-      const res = await fetch("/api/submit", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ answers: state.answers }),
-      });
-      if (!res.ok) throw new Error("submit failed");
-    } catch (err) {
-      console.error(err);
-      alert("Не удалось сохранить ответы. Проверьте, что сервер запущен, и попробуйте ещё раз.");
-      state.busy = false;
-      return;
-    }
+    await submitAnswers(state.answers);
 
     try {
-      sessionStorage.setItem("tree-survey-last", JSON.stringify(state.answers));
+      sessionStorage.setItem(LAST_KEY, JSON.stringify(state.answers));
     } catch {
       /* ignore */
     }
@@ -194,7 +266,7 @@
 
   function getLastAnswers() {
     try {
-      const raw = sessionStorage.getItem("tree-survey-last");
+      const raw = sessionStorage.getItem(LAST_KEY);
       return raw ? JSON.parse(raw) : null;
     } catch {
       return null;
@@ -206,16 +278,7 @@
     els.resultsSub.textContent = "Загрузка…";
     els.resultsGrid.replaceChildren();
 
-    let stats;
-    try {
-      const res = await fetch("/api/stats");
-      stats = await res.json();
-    } catch (err) {
-      console.error(err);
-      els.resultsSub.textContent = "Не удалось загрузить статистику.";
-      return;
-    }
-
+    const stats = await loadStats();
     const yours = userAnswers || getLastAnswers();
     const n = stats.totalSubmissions || 0;
     els.resultsSub.textContent =
@@ -224,6 +287,13 @@
         : n === 1
           ? "1 прохождение"
           : `${n} прохождений`;
+
+    if (els.resultsNote) {
+      els.resultsNote.textContent =
+        state.storageMode === "local"
+          ? "Сейчас статистика хранится в этом браузере (на GitHub Pages нет общего сервера). Для общей сводки у всех запускайте npm start локально."
+          : "Данные обезличены. Каждый проход добавляется к общей сводке на сервере.";
+    }
 
     const imageStatsList = stats.images || [];
     for (let i = 0; i < SLIDE_COUNT; i++) {

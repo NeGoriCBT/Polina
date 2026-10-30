@@ -63,7 +63,17 @@ function appendSubmission(entry) {
   return list.length;
 }
 
+function isCompleteSubmission(sub) {
+  return (
+    sub &&
+    Number(sub.schema) === 3 &&
+    Array.isArray(sub.answers) &&
+    sub.answers.length === SLIDE_COUNT
+  );
+}
+
 function aggregate(submissions) {
+  const valid = submissions.filter(isCompleteSubmission);
   const images = SLIDES.map((slide) => ({
     image: slide.image,
     label: `Стиль ${slide.image}`,
@@ -71,9 +81,7 @@ function aggregate(submissions) {
     counts: Object.fromEntries(slide.options.map((o) => [o, 0])),
   }));
 
-  for (const sub of submissions) {
-    if (!sub || !Array.isArray(sub.answers)) continue;
-    // Schema v2: [{ image, id, value }]
+  for (const sub of valid) {
     for (const row of sub.answers) {
       const idx = Number(row.image) - 1;
       if (idx < 0 || idx >= SLIDE_COUNT) continue;
@@ -88,7 +96,7 @@ function aggregate(submissions) {
 
   return {
     schema: 3,
-    totalSubmissions: submissions.length,
+    totalSubmissions: valid.length,
     slides: SLIDES,
     images,
   };

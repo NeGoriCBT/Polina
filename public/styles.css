@@ -1332,43 +1332,85 @@ a.btn {
   line-height: 1.6;
 }
 
-.guide-nav {
-  max-width: 920px;
-  margin: 0 auto;
-  padding: 1.25rem clamp(1.25rem, 4vw, 3rem);
+.guide-rail {
+  position: fixed;
+  top: 50%;
+  right: max(0.55rem, calc((100vw - 920px) / 2 - 3.25rem));
+  transform: translateY(-50%);
+  z-index: 8;
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.45rem 0.55rem;
-  border-bottom: 1px solid var(--line);
-  position: sticky;
-  top: 0;
-  z-index: 5;
-  background: rgba(10, 10, 10, 0.92);
-  backdrop-filter: blur(8px);
-}
-
-.guide-chip {
-  display: inline-flex;
+  flex-direction: column;
   align-items: center;
-  padding: 0.35rem 0.7rem;
-  border: 1px solid var(--line);
-  color: #cfcfcf;
-  text-decoration: none;
-  font-size: 0.78rem;
-  letter-spacing: 0.02em;
+  gap: 0.38rem;
+  padding: 0.55rem 0.35rem;
+  border-radius: 999px;
+  background: rgba(12, 12, 12, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+  max-height: min(88dvh, 36rem);
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
 }
 
-.guide-chip:hover,
-.guide-chip:focus-visible {
-  border-color: var(--fg);
-  color: var(--fg);
+.guide-rail::-webkit-scrollbar {
+  width: 3px;
+}
+
+.guide-rail::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.22);
+  border-radius: 999px;
+}
+
+.guide-rail-dot {
+  position: relative;
+  width: 1.85rem;
+  height: 1.85rem;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 1.5px solid rgba(255, 255, 255, 0.18);
+  opacity: 0.55;
+  transform: scale(0.92);
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+  text-decoration: none;
+}
+
+.guide-rail-dot img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 40%;
+  display: block;
+  pointer-events: none;
+}
+
+.guide-rail-dot:hover,
+.guide-rail-dot:focus-visible {
+  opacity: 1;
+  transform: scale(1.08);
+  border-color: rgba(255, 255, 255, 0.7);
   outline: none;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.12);
+}
+
+.guide-rail-dot.is-active {
+  opacity: 1;
+  transform: scale(1.14);
+  border-color: #fff;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2);
 }
 
 .guide-list {
   max-width: 920px;
   margin: 0 auto;
   padding: 2rem clamp(1.25rem, 4vw, 3rem) 1rem;
+  padding-right: clamp(3.5rem, 8vw, 5.5rem);
   display: flex;
   flex-direction: column;
   gap: 3.25rem;
@@ -1476,18 +1518,40 @@ a.btn {
 @media (max-width: 760px) {
   .guide-card {
     grid-template-columns: 1fr;
+    scroll-margin-top: 1rem;
   }
 
   .guide-frame {
     max-width: 18rem;
   }
 
-  .guide-nav {
-    position: static;
+  .guide-rail {
+    top: auto;
+    bottom: 0.75rem;
+    right: 50%;
+    left: auto;
+    transform: translateX(50%);
+    flex-direction: row;
+    max-height: none;
+    max-width: min(94vw, 28rem);
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 0.4rem 0.55rem;
+    gap: 0.32rem;
   }
 
-  .guide-card {
-    scroll-margin-top: 1rem;
+  .guide-rail-dot {
+    width: 1.65rem;
+    height: 1.65rem;
+  }
+
+  .guide-list {
+    padding-right: clamp(1.25rem, 4vw, 3rem);
+    padding-bottom: 4.5rem;
+  }
+
+  .guide-foot {
+    padding-bottom: 5rem;
   }
 }
 

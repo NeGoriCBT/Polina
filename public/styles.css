@@ -1186,12 +1186,12 @@ button {
   justify-content: center;
 }
 
-.reward-insight {
-  margin: 1.75rem 0 0;
-  max-width: 28rem;
+.results-insight {
+  margin: 2.5rem auto 0;
+  max-width: 34rem;
   text-align: center;
   font-family: var(--font-display);
-  font-size: clamp(1.15rem, 2.8vw, 1.45rem);
+  font-size: clamp(1.2rem, 2.8vw, 1.55rem);
   font-style: italic;
   font-weight: 400;
   line-height: 1.45;

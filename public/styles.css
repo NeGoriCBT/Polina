@@ -1421,7 +1421,7 @@ a.btn {
   grid-template-columns: minmax(140px, 240px) minmax(0, 1fr);
   gap: 1.5rem 2rem;
   align-items: start;
-  scroll-margin-top: 5.5rem;
+  scroll-margin-top: 1.25rem;
   opacity: 0;
   animation: soft-in 0.65s ease forwards;
   animation-delay: calc(var(--i, 0) * 0.04s);

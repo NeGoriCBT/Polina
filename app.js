@@ -177,6 +177,54 @@
     else introHybrid.stop();
   }
 
+  function setRouteHash(hash) {
+    const next = hash ? `#${hash}` : location.pathname + location.search;
+    if (hash) {
+      if (location.hash !== `#${hash}`) history.replaceState(null, "", `#${hash}`);
+    } else if (location.hash) {
+      history.replaceState(null, "", next);
+    }
+  }
+
+  function goHome() {
+    showScreen("intro");
+    setRouteHash("");
+  }
+
+  function goMyTree() {
+    const existing = readMyTree();
+    const answers = state.pendingResultsAnswers || state.answers || getLastAnswers() || [];
+    showRewardScreen(answers);
+    if (!existing && !answers.length) {
+      if (els.rewardLead) {
+        els.rewardLead.textContent =
+          "Сначала пройдите опрос — после него можно получить своё дерево один раз.";
+      }
+      if (els.btnClaimTree) {
+        els.btnClaimTree.hidden = true;
+        els.btnClaimTree.disabled = true;
+      }
+    }
+    setRouteHash("my-tree");
+  }
+
+  function goResultsNav() {
+    showResults([]);
+    setRouteHash("results");
+  }
+
+  function applyRouteFromHash() {
+    const hash = (location.hash || "").replace(/^#/, "");
+    if (hash === "results") goResultsNav();
+    else if (hash === "my-tree") goMyTree();
+  }
+
+  window.TreeSurveyNav = {
+    goHome,
+    goMyTree,
+    goResults: goResultsNav,
+  };
+
   function imageUrl(n, ext) {
     return `images/tree-${n}${ext}`;
   }
@@ -1455,4 +1503,6 @@
   renderFeelingList();
   prefetchImages();
   introHybrid.start();
+  applyRouteFromHash();
+  window.addEventListener("hashchange", applyRouteFromHash);
 })();

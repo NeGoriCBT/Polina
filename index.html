@@ -7,12 +7,25 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=37" />
+  <link rel="stylesheet" href="styles.css?v=47" />
   <link rel="preload" as="image" href="images/tree-1.jpg" />
   <link rel="preload" as="image" href="images/tree-2.jpg" />
   <link rel="preload" as="image" href="images/tree-3.jpg" />
 </head>
 <body>
+  <div class="site-menu" id="site-menu">
+    <button type="button" class="site-menu-toggle" aria-expanded="false" aria-controls="site-menu-panel" aria-label="Меню">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="site-menu-backdrop" hidden></div>
+    <nav class="site-menu-panel" id="site-menu-panel" aria-label="Разделы сайта" aria-hidden="true">
+      <a class="site-menu-link" href="index.html" data-nav="home">Главная</a>
+      <a class="site-menu-link" href="index.html#my-tree" data-nav="tree">Моё дерево</a>
+      <a class="site-menu-link" href="styles-guide.html" data-nav="history">История</a>
+      <a class="site-menu-link" href="index.html#results" data-nav="results">Результаты</a>
+    </nav>
+  </div>
+
   <main id="app">
     <!-- Intro -->
     <section id="screen-intro" class="screen screen--intro is-active" aria-labelledby="intro-title">
@@ -129,7 +142,8 @@
       </div>
     </section>
   </main>
-  <script src="config.js?v=32"></script>
-  <script src="app.js?v=32"></script>
+  <script src="menu.js?v=47"></script>
+  <script src="config.js?v=47"></script>
+  <script src="app.js?v=47"></script>
 </body>
 </html>

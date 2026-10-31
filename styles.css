@@ -1357,7 +1357,7 @@ a.btn {
   left: 50%;
   width: 2px;
   transform: translateX(-50%);
-  background: #fff;
+  background: #8a8a8a;
   pointer-events: none;
   z-index: 0;
 }
@@ -1368,12 +1368,12 @@ a.btn {
   width: 1.7rem;
   height: 1.7rem;
   flex: 0 0 auto;
-  border-radius: 50%;
+  border-radius: 0.2rem;
   overflow: hidden;
-  border: 1.5px solid #fff;
+  border: 1.5px solid #8a8a8a;
   background: #111;
   transform: scale(1);
-  transition: transform 0.25s ease;
+  transition: transform 0.25s ease, border-color 0.25s ease;
   text-decoration: none;
 }
 
@@ -1389,11 +1389,13 @@ a.btn {
 .guide-rail-dot:hover,
 .guide-rail-dot:focus-visible {
   transform: scale(1.22);
+  border-color: #c4c4c4;
   outline: none;
 }
 
 .guide-rail-dot.is-active {
   transform: scale(1.22);
+  border-color: #c4c4c4;
 }
 
 .guide-list {

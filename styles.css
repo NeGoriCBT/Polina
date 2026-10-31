@@ -146,6 +146,12 @@ body.site-menu-open {
   color: #fff;
 }
 
+.site-menu-link.is-disabled {
+  color: #5a5a5a;
+  pointer-events: none;
+  cursor: default;
+}
+
 button {
   font: inherit;
   color: inherit;

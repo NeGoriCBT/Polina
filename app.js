@@ -71,6 +71,7 @@
   const STORAGE_KEY = "tree-survey-submissions-v9";
   const LAST_KEY = "tree-survey-last-v9";
   const MY_TREE_KEY = "tree-survey-my-tree-v2";
+  const DONE_KEY = "tree-survey-done-v1";
   const SUBMISSION_SCHEMA = 8;
   const REWARD_CORNERS = [
     { key: "tl", left: "0", top: "0" },
@@ -117,7 +118,6 @@
     reward: document.getElementById("screen-reward"),
     results: document.getElementById("screen-results"),
     btnStart: document.getElementById("btn-start"),
-    btnResults: document.getElementById("btn-results"),
     btnClaimTree: document.getElementById("btn-claim-tree"),
     btnDownloadTree: document.getElementById("btn-download-tree"),
     btnRewardResults: document.getElementById("btn-reward-results"),
@@ -210,7 +210,36 @@
     setRouteHash("my-tree");
   }
 
+  function hasCompletedSurvey() {
+    if (window.TreeSurveyMenu && window.TreeSurveyMenu.hasCompletedSurvey) {
+      return window.TreeSurveyMenu.hasCompletedSurvey();
+    }
+    try {
+      if (localStorage.getItem(DONE_KEY) === "1") return true;
+      if (localStorage.getItem(MY_TREE_KEY)) return true;
+      if (sessionStorage.getItem(LAST_KEY)) return true;
+    } catch {
+      /* ignore */
+    }
+    return false;
+  }
+
+  function markSurveyDone() {
+    try {
+      localStorage.setItem(DONE_KEY, "1");
+    } catch {
+      /* ignore */
+    }
+    if (window.TreeSurveyMenu && window.TreeSurveyMenu.markDone) {
+      window.TreeSurveyMenu.markDone();
+    }
+  }
+
   function goResultsNav() {
+    if (!hasCompletedSurvey()) {
+      goHome();
+      return;
+    }
     showResults([]);
     setRouteHash("results");
   }
@@ -1062,6 +1091,7 @@
       /* ignore */
     }
 
+    markSurveyDone();
     showRewardScreen(state.answers);
     state.busy = false;
   }
@@ -1483,11 +1513,6 @@
     resetSurvey();
     showScreen("survey");
     renderSlide();
-  });
-
-  els.btnResults.addEventListener("click", () => {
-    // Empty array: show shared aggregates only (no “ваш ответ” from a prior run).
-    showResults([]);
   });
 
   if (els.btnClaimTree) {

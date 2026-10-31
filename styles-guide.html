@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=37" />
+  <link rel="stylesheet" href="styles.css?v=38" />
 </head>
 <body class="guide-page">
   <header class="guide-top">
@@ -26,7 +26,7 @@
     <a class="btn" href="index.html">Пройти опрос</a>
   </footer>
 
-  <script>
+    <script>
     const STYLES = [
       {
         name: "Ренессанс",
@@ -37,7 +37,7 @@
           "Зародился в Италии на рубеже XIV–XV веков и распространился по Европе. Художники заново открыли античность, перспективу, анатомию и интерес к реальному человеку и природе.",
         artists: "Леонардо да Винчи, Микеланджело, Рафаэль, Боттичелли, Дюрер",
       },
-            {
+      {
         name: "Барокко",
         year: "~1600",
         image: 2,
@@ -47,7 +47,7 @@
         artists: "Караваджо, Бернини, Рубенс, Рембрандт, Веласкес",
         source: "Большая российская энциклопедия",
         sourceUrl: "https://bre.ruwiki.ru/wiki/Барокко",
-      }
+      },
       {
         name: "Рококо",
         year: "~1730",
@@ -131,7 +131,7 @@
           "С 1910-х годов художники уходят от узнаваемой натуры к цвету, линии и ритму. Важнее не сюжет, а сама живописная конструкция и её воздействие.",
         artists: "Кандинский, Мондриан, Малевич, Купка",
       },
-            {
+      {
         name: "Супрематизм",
         year: "~1915",
         image: 11,
@@ -141,7 +141,7 @@
         artists: "Малевич, Розанова, Клюн, Попова, Удальцова, Пуни, Суетин, Лисицкий",
         source: "Большая российская энциклопедия",
         sourceUrl: "https://bre.ruwiki.ru/wiki/Супрематизм",
-      }
+      },
       {
         name: "Дадаизм",
         year: "~1916",
@@ -178,7 +178,7 @@
           "Сложился в 1960-х, особенно в США. Убирали всё лишнее: простые формы, повтор, ясность, отказ от повествовательности.",
         artists: "Джадд, Флавин, Андре, Мартин, Келли",
       },
-            {
+      {
         name: "Поп-арт",
         year: "~1962",
         image: 16,
@@ -188,8 +188,7 @@
         artists: "Уорхол, Лихтенштейн, Олденбург, Розенквист, Гамильтон, Блейк, Хокни, Рушей",
         source: "Большая российская энциклопедия",
         sourceUrl: "https://bre.ruwiki.ru/wiki/Поп-арт",
-      }
-
+      },
       {
         name: "Постмодернизм",
         year: "~1980",
@@ -200,7 +199,14 @@
         artists: "Баския, Шнабель, Кунс, Лонго, Салле, Фишль, Хэринг, Балдессари",
         source: "Большая российская энциклопедия",
         sourceUrl: "https://bre.ruwiki.ru/wiki/Постмодернизм",
-      },`;
+      },
+    ];
+
+    const nav = document.getElementById("guide-nav");
+    const list = document.getElementById("guide-list");
+
+    STYLES.forEach((style, i) => {
+      const id = `style-${style.image}`;
 
       const chip = document.createElement("a");
       chip.className = "guide-chip";

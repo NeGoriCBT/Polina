@@ -38,7 +38,8 @@ body.site-menu-open {
 .site-menu {
   position: fixed;
   top: 0;
-  left: 0;
+  right: 0;
+  left: auto;
   z-index: 60;
 }
 
@@ -47,7 +48,8 @@ body.site-menu-open {
   z-index: 62;
   width: 2.75rem;
   height: 2.75rem;
-  margin: 0.85rem 0 0 0.85rem;
+  margin: 0.85rem 0.85rem 0 0;
+  margin-left: auto;
   display: inline-flex;
   flex-direction: column;
   justify-content: center;
@@ -94,14 +96,16 @@ body.site-menu-open {
 .site-menu-panel {
   position: fixed;
   top: 0;
-  left: 0;
+  right: 0;
+  left: auto;
   z-index: 61;
   width: min(18rem, 84vw);
   height: 100dvh;
   padding: 5rem 1.5rem 2rem;
   background: #0f0f0f;
-  border-right: 1px solid var(--line);
-  transform: translateX(-105%);
+  border-left: 1px solid var(--line);
+  border-right: none;
+  transform: translateX(105%);
   transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -1404,7 +1408,7 @@ a.btn {
 .guide-top {
   max-width: 920px;
   margin: 0 auto;
-  padding: 1.5rem clamp(1.25rem, 4vw, 3rem) 1rem;
+  padding: 4.25rem clamp(1.25rem, 4vw, 3rem) 1rem;
 }
 
 .guide-back {

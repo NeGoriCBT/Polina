@@ -217,7 +217,7 @@
     try {
       if (localStorage.getItem(DONE_KEY) === "1") return true;
       if (localStorage.getItem(MY_TREE_KEY)) return true;
-      if (sessionStorage.getItem(LAST_KEY)) return true;
+      if (localStorage.getItem(LAST_KEY)) return true;
     } catch {
       /* ignore */
     }
@@ -247,9 +247,9 @@
   function syncStartButton() {
     if (!els.btnStart) return;
     if (hasCompletedSurvey()) {
-      els.btnStart.textContent = "Опрос уже пройден";
-      els.btnStart.disabled = true;
-      els.btnStart.title = "Пройти можно только один раз";
+      els.btnStart.textContent = "Моё дерево";
+      els.btnStart.disabled = false;
+      els.btnStart.title = "Опрос можно пройти только один раз";
     } else {
       els.btnStart.textContent = "Далее";
       els.btnStart.disabled = false;

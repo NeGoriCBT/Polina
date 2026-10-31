@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=45" />
+  <link rel="stylesheet" href="styles.css?v=46" />
 </head>
 <body class="guide-page">
   <header class="guide-top">
@@ -20,6 +20,11 @@
   </header>
     <nav class="guide-rail" id="guide-rail" aria-label="Навигация по стилям"></nav>
   <main class="guide-list" id="guide-list"></main>
+
+  <div class="guide-lightbox" id="guide-lightbox" hidden>
+    <button type="button" class="guide-lightbox__close" aria-label="Закрыть">×</button>
+    <figure class="guide-lightbox__frame" id="guide-lightbox-frame"></figure>
+  </div>
 
   <footer class="guide-foot">
     <a class="btn" href="index.html">Пройти опрос</a>
@@ -277,6 +282,64 @@
 
     if (location.hash) setActive(location.hash.slice(1));
     else if (dots[0]) setActive(dots[0].id);
+
+    const lightbox = document.getElementById("guide-lightbox");
+    const lightboxFrame = document.getElementById("guide-lightbox-frame");
+    let lightboxOpen = false;
+
+    const closeLightbox = () => {
+      if (!lightboxOpen) return;
+      lightboxOpen = false;
+      lightbox.classList.remove("is-open");
+      document.body.classList.remove("guide-lightbox-open");
+      lightboxFrame.innerHTML = "";
+      lightbox.hidden = true;
+    };
+
+    const openLightbox = (style) => {
+      lightboxOpen = true;
+      lightboxFrame.className = `picture-frame picture-frame--${style.frame} guide-lightbox__frame`;
+      lightboxFrame.innerHTML = `
+        <div class="picture-frame__moulding">
+          <div class="picture-frame__lip">
+            <div class="picture-frame__matte">
+              <div class="picture-frame__glass">
+                <img src="images/tree-${style.image}.jpg" alt="${style.name}" />
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      lightbox.hidden = false;
+      lightbox.classList.add("is-open");
+      document.body.classList.add("guide-lightbox-open");
+    };
+
+    const toggleLightbox = (style) => {
+      if (lightboxOpen) closeLightbox();
+      else openLightbox(style);
+    };
+
+    list.querySelectorAll(".guide-frame").forEach((frame, i) => {
+      frame.classList.add("guide-frame--zoomable");
+      frame.setAttribute("role", "button");
+      frame.setAttribute("tabindex", "0");
+      frame.setAttribute("aria-label", `Открыть: ${STYLES[i].name}`);
+      const activate = (e) => {
+        e.preventDefault();
+        toggleLightbox(STYLES[i]);
+      };
+      frame.addEventListener("click", activate);
+      frame.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") activate(e);
+      });
+    });
+
+    lightbox.addEventListener("click", () => closeLightbox());
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeLightbox();
+    });
+
 
   </script>
 </body>

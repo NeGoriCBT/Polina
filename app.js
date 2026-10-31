@@ -193,7 +193,9 @@
 
   function goMyTree() {
     const existing = readMyTree();
-    const answers = state.pendingResultsAnswers || state.answers || getLastAnswers() || [];
+    const fromState = state.pendingResultsAnswers || state.answers;
+    const answers =
+      fromState && fromState.length ? fromState : getLastAnswers() || [];
     showRewardScreen(answers);
     if (!existing && !answers.length) {
       if (els.rewardLead) {

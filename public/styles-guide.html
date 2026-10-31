@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=40" />
+  <link rel="stylesheet" href="styles.css?v=41" />
 </head>
 <body class="guide-page">
   <header class="guide-top">
@@ -18,8 +18,6 @@
       Краткая история каждого направления и имена главных представителей.
     </p>
   </header>
-
-  <nav class="guide-nav" id="guide-nav" aria-label="Стили"></nav>
   <main class="guide-list" id="guide-list"></main>
 
   <footer class="guide-foot">
@@ -206,17 +204,10 @@
       },
     ];
 
-    const nav = document.getElementById("guide-nav");
     const list = document.getElementById("guide-list");
 
     STYLES.forEach((style, i) => {
       const id = `style-${style.image}`;
-
-      const chip = document.createElement("a");
-      chip.className = "guide-chip";
-      chip.href = `#${id}`;
-      chip.textContent = style.name;
-      nav.appendChild(chip);
 
       const article = document.createElement("article");
       article.className = "guide-card";

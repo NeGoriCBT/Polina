@@ -1448,6 +1448,23 @@ a.btn {
   letter-spacing: 0.04em;
 }
 
+.guide-card-source {
+  margin: 0.75rem 0 0;
+  font-size: 0.8rem;
+  color: #7a7a7a;
+}
+
+.guide-card-source a {
+  color: #a8a8a8;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.guide-card-source a:hover,
+.guide-card-source a:focus-visible {
+  color: var(--fg);
+}
+
 .guide-foot {
   max-width: 920px;
   margin: 0 auto;

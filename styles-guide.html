@@ -227,6 +227,11 @@
           </header>
           <p class="guide-card-text">${style.history}</p>
           <p class="guide-card-artists"><span>Представители:</span> ${style.artists}</p>
+          ${
+            style.sourceUrl
+              ? `<p class="guide-card-source">Источник: <a href="${style.sourceUrl}" target="_blank" rel="noopener noreferrer">${style.source || "ссылка"}</a></p>`
+              : ""
+          }
         </div>
       `;
       list.appendChild(article);

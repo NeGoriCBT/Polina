@@ -68,8 +68,8 @@
 
   const SLIDE_COUNT = SLIDES.length;
   const EXT_CANDIDATES = [".jpg", ".jpeg", ".webp", ".png"];
-  const STORAGE_KEY = "tree-survey-submissions-v9";
-  const LAST_KEY = "tree-survey-last-v9";
+  const STORAGE_KEY = "tree-survey-submissions-v10";
+  const LAST_KEY = "tree-survey-last-v10";
   const MY_TREE_KEY = "tree-survey-my-tree-v2";
   const DONE_KEY = "tree-survey-done-v1";
   const SUBMISSION_SCHEMA = 8;
@@ -240,8 +240,21 @@
       goHome();
       return;
     }
-    showResults([]);
+    showResults(getLastAnswers());
     setRouteHash("results");
+  }
+
+  function syncStartButton() {
+    if (!els.btnStart) return;
+    if (hasCompletedSurvey()) {
+      els.btnStart.textContent = "Опрос уже пройден";
+      els.btnStart.disabled = true;
+      els.btnStart.title = "Пройти можно только один раз";
+    } else {
+      els.btnStart.textContent = "Далее";
+      els.btnStart.disabled = false;
+      els.btnStart.title = "";
+    }
   }
 
   function applyRouteFromHash() {
@@ -1086,20 +1099,28 @@
     await submitAnswers(state.answers);
 
     try {
-      sessionStorage.setItem(LAST_KEY, JSON.stringify(state.answers));
+      localStorage.setItem(LAST_KEY, JSON.stringify(state.answers));
     } catch {
       /* ignore */
     }
 
     markSurveyDone();
+    syncStartButton();
     showRewardScreen(state.answers);
     state.busy = false;
   }
 
   function getLastAnswers() {
     try {
-      const raw = sessionStorage.getItem(LAST_KEY);
-      return raw ? JSON.parse(raw) : null;
+      const raw = localStorage.getItem(LAST_KEY);
+      if (raw) return JSON.parse(raw);
+      // migrate one-session answers if present
+      const legacy = sessionStorage.getItem("tree-survey-last-v9");
+      if (legacy) {
+        localStorage.setItem(LAST_KEY, legacy);
+        return JSON.parse(legacy);
+      }
+      return null;
     } catch {
       return null;
     }
@@ -1111,7 +1132,8 @@
     els.resultsGrid.replaceChildren();
 
     const stats = await loadStats();
-    const yours = userAnswers || getLastAnswers();
+    const yours =
+      userAnswers && userAnswers.length ? userAnswers : getLastAnswers();
     const n = stats.totalSubmissions || 0;
     els.resultsSub.textContent =
       n === 0
@@ -1510,6 +1532,10 @@
   });
 
   els.btnStart.addEventListener("click", () => {
+    if (hasCompletedSurvey()) {
+      goMyTree();
+      return;
+    }
     resetSurvey();
     showScreen("survey");
     renderSlide();
@@ -1530,6 +1556,7 @@
   renderFeelingList();
   prefetchImages();
   introHybrid.start();
+  syncStartButton();
   applyRouteFromHash();
   window.addEventListener("hashchange", applyRouteFromHash);
 })();

@@ -1303,12 +1303,13 @@ button {
   font-size: 0.9rem;
 }
 
-.stat-row.is-yours .stat-label::after {
-  content: " · ваш ответ";
-  color: var(--muted);
-  font-size: 0.75rem;
-  letter-spacing: 0;
-  text-transform: none;
+.stat-row.is-yours .stat-label {
+  color: #d4af37;
+  font-weight: 600;
+}
+
+.stat-row.is-yours .stat-pct {
+  color: #d4af37;
 }
 
 .bar-track {

@@ -1,6 +1,7 @@
 (() => {
   const DONE_KEY = "tree-survey-done-v1";
-  const LAST_KEY = "tree-survey-last-v9";
+  const LAST_KEY = "tree-survey-last-v10";
+  const LEGACY_LAST_KEY = "tree-survey-last-v9";
   const MY_TREE_KEY = "tree-survey-my-tree-v2";
 
   const root = document.querySelector(".site-menu");
@@ -17,7 +18,8 @@
     try {
       if (localStorage.getItem(DONE_KEY) === "1") return true;
       if (localStorage.getItem(MY_TREE_KEY)) return true;
-      if (sessionStorage.getItem(LAST_KEY)) return true;
+      if (localStorage.getItem(LAST_KEY)) return true;
+      if (sessionStorage.getItem(LEGACY_LAST_KEY)) return true;
     } catch {
       /* ignore */
     }

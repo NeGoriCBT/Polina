@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Черновик: варианты стрелок вниз</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --fg: #f2f2f2;
+      --muted: #8a8a8a;
+      --line: #2a2a2a;
+      --font-display: "Cormorant Garamond", "Times New Roman", serif;
+      --font-body: "Manrope", "Helvetica Neue", sans-serif;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      background:
+        radial-gradient(ellipse 80% 50% at 50% 0%, #161616 0%, var(--bg) 55%);
+      color: var(--fg);
+      font-family: var(--font-body);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .page {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 2.5rem clamp(1.25rem, 4vw, 3rem) 4rem;
+    }
+
+    .back {
+      display: inline-block;
+      margin-bottom: 1.5rem;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      letter-spacing: 0.04em;
+    }
+
+    .back:hover {
+      color: var(--fg);
+    }
+
+    h1 {
+      margin: 0 0 0.75rem;
+      font-family: var(--font-display);
+      font-weight: 400;
+      font-size: clamp(2rem, 5vw, 3rem);
+      letter-spacing: -0.02em;
+    }
+
+    .lead {
+      margin: 0 0 2.5rem;
+      max-width: 34rem;
+      color: #c8c8c8;
+      line-height: 1.6;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+      gap: 1.25rem;
+    }
+
+    .card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 1.25rem;
+      min-height: 15rem;
+      padding: 1.5rem 1.25rem 1.35rem;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .stage {
+      flex: 1;
+      display: grid;
+      place-items: center;
+      width: 100%;
+      min-height: 7.5rem;
+    }
+
+    .label {
+      margin: 0;
+      width: 100%;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.8rem;
+      letter-spacing: 0.04em;
+      line-height: 1.4;
+    }
+
+    .label strong {
+      display: block;
+      margin-bottom: 0.2rem;
+      color: #ddd;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+    }
+
+    .arrow {
+      color: rgba(242, 242, 242, 0.78);
+    }
+
+    .arrow svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* 1 — current site */
+    .a1 {
+      width: 1.55rem;
+      height: 1.55rem;
+      animation: drift 2.8s cubic-bezier(0.45, 0, 0.2, 1) infinite;
+    }
+
+    /* 2 — double chevron */
+    .a2 {
+      width: 1.6rem;
+      height: 1.9rem;
+      position: relative;
+    }
+
+    .a2 span {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 1.1rem;
+      animation: double-soft 2.6s ease-in-out infinite;
+    }
+
+    .a2 span:first-child {
+      top: 0;
+      animation-delay: 0s;
+    }
+
+    .a2 span:last-child {
+      top: 0.55rem;
+      animation-delay: 0.18s;
+    }
+
+    /* 3 — thin stem */
+    .a3 {
+      width: 1.4rem;
+      height: 2.4rem;
+      animation: drift 3.1s cubic-bezier(0.45, 0, 0.2, 1) infinite;
+    }
+
+    /* 4 — mouse / scroll pill */
+    .a4 {
+      width: 1.35rem;
+      height: 2.15rem;
+      border: 1.4px solid rgba(255, 255, 255, 0.55);
+      border-radius: 999px;
+      position: relative;
+    }
+
+    .a4 i {
+      position: absolute;
+      top: 0.35rem;
+      left: 50%;
+      width: 0.22rem;
+      height: 0.38rem;
+      margin-left: -0.11rem;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.85);
+      animation: mouse-dot 2.2s cubic-bezier(0.45, 0, 0.2, 1) infinite;
+    }
+
+    /* 5 — ghost fade */
+    .a5 {
+      width: 1.7rem;
+      height: 1.7rem;
+      animation: ghost 2.9s ease-in-out infinite;
+    }
+
+    /* 6 — breathing ring */
+    .a6 {
+      width: 2.6rem;
+      height: 2.6rem;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      display: grid;
+      place-items: center;
+      animation: breathe 3.4s ease-in-out infinite;
+    }
+
+    .a6 .inner {
+      width: 1.25rem;
+      height: 1.25rem;
+      animation: drift 2.8s cubic-bezier(0.45, 0, 0.2, 1) infinite;
+    }
+
+    /* 7 — long soft line */
+    .a7 {
+      width: 1.5rem;
+      height: 2.6rem;
+      animation: drift 3.3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    }
+
+    /* 8 — pulse tip */
+    .a8 {
+      width: 1.6rem;
+      height: 1.8rem;
+      position: relative;
+    }
+
+    .a8 svg {
+      position: relative;
+      z-index: 1;
+      animation: drift 2.7s cubic-bezier(0.45, 0, 0.2, 1) infinite;
+    }
+
+    .a8::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: 0.05rem;
+      width: 0.45rem;
+      height: 0.45rem;
+      margin-left: -0.225rem;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.35);
+      animation: tip-pulse 2.7s ease-out infinite;
+    }
+
+    @keyframes drift {
+      0%,
+      100% {
+        transform: translateY(0);
+        opacity: 0.55;
+      }
+      50% {
+        transform: translateY(0.45rem);
+        opacity: 1;
+      }
+    }
+
+    @keyframes double-soft {
+      0%,
+      100% {
+        transform: translateY(0);
+        opacity: 0.25;
+      }
+      45%,
+      55% {
+        transform: translateY(0.35rem);
+        opacity: 0.95;
+      }
+    }
+
+    @keyframes mouse-dot {
+      0% {
+        transform: translateY(0);
+        opacity: 1;
+      }
+      70% {
+        transform: translateY(0.7rem);
+        opacity: 0;
+      }
+      100% {
+        transform: translateY(0);
+        opacity: 0;
+      }
+    }
+
+    @keyframes ghost {
+      0% {
+        transform: translateY(-0.15rem);
+        opacity: 0;
+      }
+      35% {
+        opacity: 0.9;
+      }
+      100% {
+        transform: translateY(0.7rem);
+        opacity: 0;
+      }
+    }
+
+    @keyframes breathe {
+      0%,
+      100% {
+        transform: scale(0.96);
+        border-color: rgba(255, 255, 255, 0.16);
+      }
+      50% {
+        transform: scale(1.04);
+        border-color: rgba(255, 255, 255, 0.42);
+      }
+    }
+
+    @keyframes tip-pulse {
+      0%,
+      40% {
+        transform: scale(0.4);
+        opacity: 0;
+      }
+      55% {
+        opacity: 0.5;
+      }
+      100% {
+        transform: scale(2.2);
+        opacity: 0;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .a1,
+      .a2 span,
+      .a3,
+      .a4 i,
+      .a5,
+      .a6,
+      .a6 .inner,
+      .a7,
+      .a8 svg,
+      .a8::after {
+        animation: none !important;
+        opacity: 0.85 !important;
+        transform: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <a class="back" href="index.html">← К опросу</a>
+    <h1>Варианты стрелок</h1>
+    <p class="lead">
+      Черновик для выбора индикатора «листайте вниз». Сейчас на сайте — вариант 1.
+    </p>
+
+    <div class="grid">
+      <article class="card">
+        <div class="stage">
+          <div class="arrow a1" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M6 9.5L12 15.5L18 9.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </div>
+        </div>
+        <p class="label"><strong>1. Мягкий шеврон</strong>как сейчас на сайте</p>
+      </article>
+
+      <article class="card">
+        <div class="stage">
+          <div class="arrow a2" aria-hidden="true">
+            <span>
+              <svg viewBox="0 0 24 16" fill="none">
+                <path d="M5 4L12 11L19 4" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </span>
+            <span>
+              <svg viewBox="0 0 24 16" fill="none">
+                <path d="M5 4L12 11L19 4" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </span>
+          </div>
+        </div>
+        <p class="label"><strong>2. Двойной шеврон</strong>волной, чуть каскадом</p>
+      </article>
+
+      <article class="card">
+        <div class="stage">
+          <div class="arrow a3" aria-hidden="true">
+            <svg viewBox="0 0 24 40" fill="none">
+              <path d="M12 4V28" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" />
+              <path d="M7 23.5L12 29.5L17 23.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </div>
+        </div>
+        <p class="label"><strong>3. Стебель</strong>тонкая линия и наконечник</p>
+      </article>
+
+      <article class="card">
+        <div class="stage">
+          <div class="arrow a4" aria-hidden="true"><i></i></div>
+        </div>
+        <p class="label"><strong>4. Скролл-капсула</strong>как жест «прокрутите»</p>
+      </article>
+
+      <article class="card">
+        <div class="stage">
+          <div class="arrow a5" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M6 9.5L12 15.5L18 9.5" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </div>
+        </div>
+        <p class="label"><strong>5. Призрак</strong>появляется и растворяется вниз</p>
+      </article>
+
+      <article class="card">
+        <div class="stage">
+          <div class="arrow a6" aria-hidden="true">
+            <div class="inner">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M6 9.5L12 15.5L18 9.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </div>
+          </div>
+        </div>
+        <p class="label"><strong>6. Дыхание</strong>кольцо + шеврон внутри</p>
+      </article>
+
+      <article class="card">
+        <div class="stage">
+          <div class="arrow a7" aria-hidden="true">
+            <svg viewBox="0 0 24 44" fill="none">
+              <path d="M12 3V31" stroke="currentColor" stroke-width="1.15" stroke-linecap="round" opacity="0.7" />
+              <path d="M12 31L12 35" stroke="currentColor" stroke-width="1.15" stroke-linecap="round" />
+              <circle cx="12" cy="38.5" r="1.6" fill="currentColor" opacity="0.85" />
+            </svg>
+          </div>
+        </div>
+        <p class="label"><strong>7. Капля</strong>длинная линия и точка</p>
+      </article>
+
+      <article class="card">
+        <div class="stage">
+          <div class="arrow a8" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </div>
+        </div>
+        <p class="label"><strong>8. Пульс</strong>шеврон и мягкое эхо внизу</p>
+      </article>
+    </div>
+  </div>
+</body>
+</html>

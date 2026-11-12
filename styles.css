@@ -313,13 +313,59 @@ button {
 .intro-about {
   position: relative;
   z-index: 3;
-  background:
-    linear-gradient(180deg, #070707 0%, var(--bg) 18%, var(--bg) 100%);
+  isolation: isolate;
+  overflow: hidden;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
   padding: clamp(3.5rem, 10vw, 6rem) clamp(1.25rem, 4vw, 3rem) 5rem;
+  background: #070707;
+}
+
+.intro-about::before {
+  content: "";
+  position: absolute;
+  inset: -2%;
+  z-index: -2;
+  background-color: #0a0a0a;
+  background-image:
+    url("images/tree-2.jpg"),
+    url("images/tree-5.jpg"),
+    url("images/tree-8.jpg"),
+    url("images/tree-17.jpg"),
+    url("images/tree-11.jpg"),
+    url("images/tree-14.jpg");
+  background-size:
+    34% 42%,
+    36% 40%,
+    33% 44%,
+    35% 42%,
+    38% 40%,
+    34% 44%;
+  background-position:
+    0% 0%,
+    100% 8%,
+    -4% 100%,
+    102% 100%,
+    48% -6%,
+    52% 108%;
+  background-repeat: no-repeat;
+  filter: grayscale(0.25) contrast(1.08) saturate(0.85) brightness(0.42);
+  transform: scale(1.04);
+}
+
+.intro-about::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.72) 0%, rgba(0, 0, 0, 0.55) 28%, rgba(0, 0, 0, 0.7) 100%),
+    radial-gradient(ellipse 70% 55% at 50% 40%, rgba(0, 0, 0, 0.15) 0%, rgba(0, 0, 0, 0.72) 78%, rgba(0, 0, 0, 0.88) 100%);
 }
 
 .intro-about-inner {
+  position: relative;
+  z-index: 1;
   max-width: 36rem;
   margin: 0 auto;
   display: flex;
@@ -338,16 +384,18 @@ button {
   font-size: clamp(1.65rem, 3.8vw, 2.15rem);
   letter-spacing: -0.02em;
   line-height: 1.15;
-  color: #f0f0f0;
+  color: #f5f5f5;
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.65);
 }
 
 .intro-about-text {
   margin: 0;
   max-width: 34rem;
-  color: #c4c4c4;
+  color: #d6d6d6;
   font-size: clamp(1.05rem, 2.2vw, 1.15rem);
   line-height: 1.8;
   font-weight: 400;
+  text-shadow: 0 1px 18px rgba(0, 0, 0, 0.55);
 }
 
 .fade-line {

@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=66" />
+  <link rel="stylesheet" href="styles.css?v=67" />
   <link rel="preload" as="image" href="images/tree-1.jpg" />
   <link rel="preload" as="image" href="images/tree-2.jpg" />
   <link rel="preload" as="image" href="images/tree-3.jpg" />
@@ -35,10 +35,10 @@
         <div class="intro-overlay">
           <div class="intro-inner" id="intro-inner">
             <h1 id="intro-title" class="intro-title fade-line" style="--d:0">Одно дерево.<br />Другой взгляд.<br />Разные чувства.</h1>
-                        <a class="intro-scroll-hint fade-line" style="--d:1" href="#intro-about" aria-label="Листать вниз">
-              <span class="intro-scroll-arrow" aria-hidden="true">
+                                    <a class="intro-scroll-hint fade-line" style="--d:1" href="#intro-about" aria-label="Листать вниз">
+              <span class="intro-scroll-arrow intro-scroll-arrow--ghost" aria-hidden="true">
                 <svg viewBox="0 0 24 24" fill="none">
-                  <path d="M6 9.5L12 15.5L18 9.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M6 9.5L12 15.5L18 9.5" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
               </span>
             </a>
@@ -46,36 +46,45 @@
         </div>
       </div>
 
-            <div class="intro-about" id="intro-about">
-        <div class="intro-about-inner">
-          <section class="intro-about-block">
-            <h2 class="intro-about-title">Что будет</h2>
-            <p class="intro-about-text">
-              Одно и то же дерево — и восемнадцать художественных миров вокруг него.
-              Стиль за стилем картина будет менять свет, ритм и характер образа,
-              будто одно дерево проживает разные жизни.
-            </p>
-          </section>
+                  <div class="intro-about" id="intro-about">
+        <div class="intro-stack">
+          <article class="intro-canvas" style="--i:0">
+            <div class="intro-canvas__paint" style="background-image:url('images/tree-2.jpg')" aria-hidden="true"></div>
+            <div class="intro-canvas__copy">
+              <h2 class="intro-about-title">Что будет</h2>
+              <p class="intro-about-text">
+                Одно и то же дерево — и восемнадцать художественных миров вокруг него.
+                Стиль за стилем картина будет менять свет, ритм и характер образа,
+                будто одно дерево проживает разные жизни.
+              </p>
+            </div>
+          </article>
 
-          <section class="intro-about-block">
-            <h2 class="intro-about-title">Что нужно</h2>
-            <p class="intro-about-text">
-              Не торопитесь оценивать. Просто смотрите — и замечайте,
-              что тихо откликается внутри: в линиях, в цвете, в самом настроении картины.
-              Какая эмоция поднимается первой?
-              Здесь нет верных и неверных ответов. Выберите чувство,
-              ближайшее вашему состоянию сейчас — без критики и без спешки себя поправить.
-            </p>
-          </section>
+          <article class="intro-canvas" style="--i:1">
+            <div class="intro-canvas__paint" style="background-image:url('images/tree-5.jpg')" aria-hidden="true"></div>
+            <div class="intro-canvas__copy">
+              <h2 class="intro-about-title">Что нужно</h2>
+              <p class="intro-about-text">
+                Не торопитесь оценивать. Просто смотрите — и замечайте,
+                что тихо откликается внутри: в линиях, в цвете, в самом настроении картины.
+                Какая эмоция поднимается первой?
+                Здесь нет верных и неверных ответов. Выберите чувство,
+                ближайшее вашему состоянию сейчас — без критики и без спешки себя поправить.
+              </p>
+            </div>
+          </article>
 
-          <section class="intro-about-block">
-            <h2 class="intro-about-title">Зачем</h2>
-            <p class="intro-about-text">
-              Чтобы увидеть: меняется не только изображение, но и переживание.
-              И чтобы чуть внимательнее услышать себя — так, как искусство помогает
-              слышать то, что в обычной спешке часто остаётся незамеченным.
-            </p>
-          </section>
+          <article class="intro-canvas" style="--i:2">
+            <div class="intro-canvas__paint" style="background-image:url('images/tree-17.jpg')" aria-hidden="true"></div>
+            <div class="intro-canvas__copy">
+              <h2 class="intro-about-title">Зачем</h2>
+              <p class="intro-about-text">
+                Чтобы увидеть: меняется не только изображение, но и переживание.
+                И чтобы чуть внимательнее услышать себя — так, как искусство помогает
+                слышать то, что в обычной спешке часто остаётся незамеченным.
+              </p>
+            </div>
+          </article>
         </div>
       </div>
     </section>
@@ -173,8 +182,8 @@
       </p>
     </section>
   </main>
-  <script src="menu.js?v=66"></script>
-  <script src="config.js?v=66"></script>
-  <script src="app.js?v=66"></script>
+  <script src="menu.js?v=67"></script>
+  <script src="config.js?v=67"></script>
+  <script src="app.js?v=67"></script>
 </body>
 </html>

@@ -434,18 +434,24 @@ button {
   z-index: 1;
   pointer-events: none;
   background:
-    linear-gradient(180deg, rgba(8, 8, 8, 0.55) 0%, rgba(8, 8, 8, 0.42) 35%, rgba(8, 8, 8, 0.7) 100%),
-    radial-gradient(ellipse 55% 50% at 50% 45%, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.72) 100%);
+    linear-gradient(180deg, rgba(6, 6, 6, 0.72) 0%, rgba(6, 6, 6, 0.58) 40%, rgba(6, 6, 6, 0.82) 100%),
+    radial-gradient(ellipse 60% 55% at 50% 45%, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0.78) 100%);
 }
 
 .intro-about-inner {
   position: relative;
   z-index: 2;
-  max-width: 34rem;
+  max-width: 36rem;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: clamp(2.1rem, 5vw, 3rem);
+  gap: clamp(1.6rem, 4vw, 2.1rem);
+  padding: clamp(1.5rem, 4vw, 2.15rem) clamp(1.25rem, 3.5vw, 1.85rem);
+  border-radius: 0.2rem;
+  background: rgba(8, 8, 8, 0.72);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
 }
 
 .intro-about-block {
@@ -453,23 +459,23 @@ button {
 }
 
 .intro-about-title {
-  margin: 0 0 0.9rem;
+  margin: 0 0 0.75rem;
   font-family: var(--font-display);
   font-weight: 400;
   font-size: clamp(1.55rem, 3.5vw, 2rem);
   letter-spacing: -0.02em;
   line-height: 1.15;
-  color: #f5f5f5;
-  text-shadow: 0 2px 22px rgba(0, 0, 0, 0.7);
+  color: #fafafa;
+  text-shadow: none;
 }
 
 .intro-about-text {
   margin: 0;
-  color: #dedede;
+  color: #e8e8e8;
   font-size: clamp(1.02rem, 2.1vw, 1.12rem);
   line-height: 1.75;
   font-weight: 400;
-  text-shadow: 0 1px 16px rgba(0, 0, 0, 0.65);
+  text-shadow: none;
 }
 
 @media (max-width: 640px) {

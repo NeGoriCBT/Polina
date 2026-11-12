@@ -295,11 +295,48 @@ button {
 }
 
 .intro-scroll-hint {
-  margin: 2rem 0 0;
-  color: #9a9a9a;
-  font-size: 0.78rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 2.4rem 0 0;
+  width: 2.75rem;
+  height: 2.75rem;
+  color: rgba(242, 242, 242, 0.72);
+  text-decoration: none;
+  border-radius: 999px;
+  transition: color 0.35s ease, background 0.35s ease;
+}
+
+.intro-scroll-hint:hover,
+.intro-scroll-hint:focus-visible {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.06);
+  outline: none;
+}
+
+.intro-scroll-arrow {
+  display: block;
+  width: 1.55rem;
+  height: 1.55rem;
+  animation: intro-arrow-drift 2.8s cubic-bezier(0.45, 0, 0.2, 1) infinite;
+}
+
+.intro-scroll-arrow svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+@keyframes intro-arrow-drift {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.55;
+  }
+  50% {
+    transform: translateY(0.45rem);
+    opacity: 1;
+  }
 }
 
 .intro-text {
@@ -1880,7 +1917,8 @@ body.guide-lightbox-open {
   .question-panel,
   .result-block,
   .bar-fill,
-  .guide-card {
+  .guide-card,
+  .intro-scroll-arrow {
     animation: none !important;
     transition: none !important;
     opacity: 1 !important;

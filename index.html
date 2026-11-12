@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=65" />
+  <link rel="stylesheet" href="styles.css?v=66" />
   <link rel="preload" as="image" href="images/tree-1.jpg" />
   <link rel="preload" as="image" href="images/tree-2.jpg" />
   <link rel="preload" as="image" href="images/tree-3.jpg" />
@@ -35,7 +35,13 @@
         <div class="intro-overlay">
           <div class="intro-inner" id="intro-inner">
             <h1 id="intro-title" class="intro-title fade-line" style="--d:0">Одно дерево.<br />Другой взгляд.<br />Разные чувства.</h1>
-            <p class="intro-scroll-hint fade-line" style="--d:1">листайте вниз</p>
+                        <a class="intro-scroll-hint fade-line" style="--d:1" href="#intro-about" aria-label="Листать вниз">
+              <span class="intro-scroll-arrow" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="M6 9.5L12 15.5L18 9.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </span>
+            </a>
           </div>
         </div>
       </div>
@@ -167,8 +173,8 @@
       </p>
     </section>
   </main>
-  <script src="menu.js?v=65"></script>
-  <script src="config.js?v=65"></script>
-  <script src="app.js?v=65"></script>
+  <script src="menu.js?v=66"></script>
+  <script src="config.js?v=66"></script>
+  <script src="app.js?v=66"></script>
 </body>
 </html>

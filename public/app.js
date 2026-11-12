@@ -1531,15 +1531,17 @@
     }
   });
 
-  els.btnStart.addEventListener("click", () => {
-    if (hasCompletedSurvey()) {
-      goMyTree();
-      return;
-    }
-    resetSurvey();
-    showScreen("survey");
-    renderSlide();
-  });
+  if (els.btnStart) {
+    els.btnStart.addEventListener("click", () => {
+      if (hasCompletedSurvey()) {
+        goMyTree();
+        return;
+      }
+      resetSurvey();
+      showScreen("survey");
+      renderSlide();
+    });
+  }
 
   if (els.btnClaimTree) {
     els.btnClaimTree.addEventListener("click", () => claimMyTree());

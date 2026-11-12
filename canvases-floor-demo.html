@@ -258,33 +258,41 @@
         radial-gradient(ellipse 55% 50% at 50% 45%, rgba(0,0,0,0.15), rgba(0,0,0,0.82) 80%);
     }
 
-    /* ——— 7. Lean stack ——— */
+    /* ——— 7. Circular stack ——— */
     .v-lean {
       position: absolute; inset: 0;
-      background: radial-gradient(ellipse 70% 50% at 50% 30%, #121212, #000 70%);
+      background: radial-gradient(ellipse 70% 55% at 50% 48%, #141414 0%, #080808 55%, #000 100%);
     }
     .v-lean-pile {
       position: absolute;
       left: 50%;
-      bottom: 8%;
-      width: min(70%, 26rem);
-      height: 78%;
-      transform: translateX(-50%);
+      top: 52%;
+      width: min(78%, 30rem);
+      aspect-ratio: 1;
+      transform: translate(-50%, -50%);
     }
     .v-lean-pile .c {
       position: absolute;
       left: 50%;
-      bottom: 0;
-      width: var(--w);
+      top: 50%;
+      width: var(--w, 7rem);
       aspect-ratio: 4/5;
       background: #1a1714 center 42% / cover no-repeat;
-      box-shadow: 0 18px 40px rgba(0,0,0,0.5);
-      transform: translateX(-50%) translateX(var(--x)) rotate(var(--r));
-      transform-origin: 50% 100%;
+      box-shadow:
+        0 14px 32px rgba(0,0,0,0.55),
+        0 1px 0 rgba(255,255,255,0.05) inset;
+      transform:
+        translate(-50%, -50%)
+        rotate(var(--a, 0deg))
+        translateY(var(--radius, -9.5rem))
+        rotate(calc(var(--a, 0deg) * -1 + var(--tilt, 0deg)));
+      transform-origin: 50% 50%;
     }
     .v-lean-veil {
       position: absolute; inset: 0; z-index: 2;
-      background: linear-gradient(180deg, rgba(0,0,0,0.55) 0%, transparent 40%, rgba(0,0,0,0.45) 100%);
+      background:
+        radial-gradient(ellipse 42% 42% at 50% 52%, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.55) 68%, rgba(0,0,0,0.82) 100%),
+        linear-gradient(180deg, rgba(0,0,0,0.45) 0%, transparent 38%, rgba(0,0,0,0.4) 100%);
     }
   </style>
 </head>
@@ -379,7 +387,7 @@
     <section class="variant">
       <div class="variant-head">
         <h2 class="variant-title">7. Стопка</h2>
-        <p class="variant-note">холсты опираются друг на друга</p>
+        <p class="variant-note">холсты по кругу, разные размеры</p>
       </div>
       <div class="frame" id="v7">
         <div class="v-lean">
@@ -464,17 +472,20 @@
     }
     mosaic.innerHTML = cells;
 
-    // 7 lean stack
-    const lean = [
-      ["10rem", "-18deg", "-4.5rem"], ["11rem", "-12deg", "-3rem"],
-      ["12rem", "-6deg", "-1.5rem"], ["13rem", "0deg", "0"],
-      ["12.5rem", "5deg", "1.4rem"], ["11.5rem", "11deg", "2.8rem"],
-      ["10.5rem", "16deg", "4.2rem"],
+    // 7 circular stack
+    const sizes = [
+      "5.2rem", "7.4rem", "6.1rem", "9.2rem", "5.8rem", "8.4rem",
+      "6.6rem", "10rem", "5.5rem", "7.8rem", "8.8rem", "6.3rem",
+      "9.6rem", "5.9rem", "7.1rem", "8.2rem", "6.8rem", "11rem",
     ];
-    document.getElementById("lean").innerHTML = lean
-      .map((l, i) => {
-        const [w, r, x] = l;
-        return `<div class="c" style="--w:${w};--r:${r};--x:${x};background-image:url('${url(nums[i * 2 + 1])}');z-index:${i}"></div>`;
+    const count = 18;
+    document.getElementById("lean").innerHTML = nums
+      .map((n, i) => {
+        const a = (360 / count) * i - 90;
+        const tilt = ((i % 5) - 2) * 2.2;
+        const radius = i % 3 === 0 ? "-10.4rem" : i % 2 === 0 ? "-9.2rem" : "-9.8rem";
+        const z = Math.round(50 + 40 * Math.sin((a * Math.PI) / 180));
+        return `<div class="c" style="--a:${a}deg;--w:${sizes[i]};--tilt:${tilt}deg;--radius:${radius};z-index:${z};background-image:url('${url(n)}')"></div>`;
       })
       .join("");
   </script>

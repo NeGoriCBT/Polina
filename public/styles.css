@@ -369,68 +369,87 @@ button {
   position: relative;
   z-index: 3;
   overflow: hidden;
-  padding: clamp(3.5rem, 9vw, 5.5rem) clamp(1.25rem, 4vw, 3rem) 5.5rem;
-  background:
-    radial-gradient(ellipse 70% 40% at 50% 0%, #141414 0%, #0a0a0a 55%, #070707 100%);
+  padding: clamp(4rem, 10vw, 6.5rem) clamp(1.25rem, 4vw, 3rem) 5.5rem;
+  background: #0a0a0a;
 }
 
 .intro-stack {
-  position: relative;
-  z-index: 1;
-  max-width: 34rem;
-  margin: 0 auto;
-  min-height: 28rem;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  display: grid;
+  place-items: center;
 }
 
 .intro-canvas {
-  position: relative;
-  width: min(100%, 30rem);
-  margin: 0 auto;
-  padding: clamp(1.6rem, 4vw, 2.15rem) clamp(1.35rem, 3.5vw, 1.9rem) clamp(1.8rem, 4vw, 2.4rem);
-  background: #1a1714;
+  position: absolute;
+  width: min(72vw, 26rem);
+  aspect-ratio: 4 / 5;
+  background-color: #1a1714;
+  background-size: cover;
+  background-position: center 42%;
+  background-repeat: no-repeat;
   box-shadow:
-    0 18px 40px rgba(0, 0, 0, 0.45),
-    0 2px 0 rgba(255, 255, 255, 0.04) inset;
-  overflow: hidden;
+    0 22px 48px rgba(0, 0, 0, 0.55),
+    0 1px 0 rgba(255, 255, 255, 0.05) inset;
+  filter: saturate(0.92) contrast(1.04);
 }
 
 .intro-canvas:nth-child(1) {
   z-index: 1;
-  transform: rotate(-2.4deg) translate(-0.35rem, 0);
+  transform: translate(-18%, -8%) rotate(-8deg);
+  opacity: 0.78;
 }
 
 .intro-canvas:nth-child(2) {
   z-index: 2;
-  margin-top: -3.6rem;
-  transform: rotate(1.8deg) translate(0.55rem, 0);
+  transform: translate(16%, -14%) rotate(6deg);
+  opacity: 0.82;
 }
 
 .intro-canvas:nth-child(3) {
   z-index: 3;
-  margin-top: -3.2rem;
-  transform: rotate(-1.1deg) translate(-0.15rem, 0);
+  transform: translate(-10%, 10%) rotate(-3.5deg);
+  opacity: 0.88;
 }
 
-.intro-canvas__paint {
-  position: absolute;
-  inset: 0;
-  background-size: cover;
-  background-position: center 40%;
-  filter: grayscale(0.2) contrast(1.05) saturate(0.9) brightness(0.38);
-  transform: scale(1.04);
+.intro-canvas:nth-child(4) {
+  z-index: 4;
+  transform: translate(12%, 16%) rotate(4.5deg);
+  opacity: 0.9;
 }
 
-.intro-canvas__paint::after {
+.intro-canvas:nth-child(5) {
+  z-index: 5;
+  width: min(68vw, 24rem);
+  transform: translate(0, 2%) rotate(-1.2deg);
+  opacity: 0.95;
+}
+
+.intro-about::after {
   content: "";
   position: absolute;
   inset: 0;
+  z-index: 1;
+  pointer-events: none;
   background:
-    linear-gradient(180deg, rgba(12, 10, 8, 0.42) 0%, rgba(12, 10, 8, 0.72) 48%, rgba(10, 8, 6, 0.88) 100%);
+    linear-gradient(180deg, rgba(8, 8, 8, 0.55) 0%, rgba(8, 8, 8, 0.42) 35%, rgba(8, 8, 8, 0.7) 100%),
+    radial-gradient(ellipse 55% 50% at 50% 45%, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.72) 100%);
 }
 
-.intro-canvas__copy {
+.intro-about-inner {
   position: relative;
-  z-index: 1;
+  z-index: 2;
+  max-width: 34rem;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(2.1rem, 5vw, 3rem);
+}
+
+.intro-about-block {
+  margin: 0;
 }
 
 .intro-about-title {
@@ -440,35 +459,34 @@ button {
   font-size: clamp(1.55rem, 3.5vw, 2rem);
   letter-spacing: -0.02em;
   line-height: 1.15;
-  color: #f7f3ea;
-  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.55);
+  color: #f5f5f5;
+  text-shadow: 0 2px 22px rgba(0, 0, 0, 0.7);
 }
 
 .intro-about-text {
   margin: 0;
-  color: #e2ddd4;
+  color: #dedede;
   font-size: clamp(1.02rem, 2.1vw, 1.12rem);
   line-height: 1.75;
   font-weight: 400;
-  text-shadow: 0 1px 14px rgba(0, 0, 0, 0.5);
+  text-shadow: 0 1px 16px rgba(0, 0, 0, 0.65);
 }
 
 @media (max-width: 640px) {
-  .intro-canvas:nth-child(2),
-  .intro-canvas:nth-child(3) {
-    margin-top: -2.5rem;
+  .intro-canvas {
+    width: min(78vw, 20rem);
   }
 
   .intro-canvas:nth-child(1) {
-    transform: rotate(-1.6deg);
+    transform: translate(-14%, -6%) rotate(-6deg);
   }
 
   .intro-canvas:nth-child(2) {
-    transform: rotate(1.2deg) translate(0.25rem, 0);
+    transform: translate(14%, -10%) rotate(5deg);
   }
 
-  .intro-canvas:nth-child(3) {
-    transform: rotate(-0.8deg);
+  .intro-canvas:nth-child(5) {
+    width: min(74vw, 19rem);
   }
 }
 

@@ -332,19 +332,22 @@ button {
 }
 
 .intro-about-title {
-  margin: 0 0 0.85rem;
+  margin: 0 0 1rem;
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: clamp(1.55rem, 3.5vw, 2rem);
+  font-size: clamp(1.65rem, 3.8vw, 2.15rem);
   letter-spacing: -0.02em;
   line-height: 1.15;
+  color: #f0f0f0;
 }
 
 .intro-about-text {
   margin: 0;
-  color: #cfcfcf;
-  font-size: 1.05rem;
-  line-height: 1.7;
+  max-width: 34rem;
+  color: #c4c4c4;
+  font-size: clamp(1.05rem, 2.2vw, 1.15rem);
+  line-height: 1.8;
+  font-weight: 400;
 }
 
 .fade-line {

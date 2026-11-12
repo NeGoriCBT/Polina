@@ -371,59 +371,59 @@ button {
   overflow: hidden;
   min-height: min(92dvh, 54rem);
   padding: clamp(4rem, 10vw, 6.5rem) clamp(1.25rem, 4vw, 3rem) 5.5rem;
-  background: #111;
+  background: #050505;
 }
 
-.intro-stack {
-  position: absolute;
-  inset: -4% -6%;
-  z-index: 0;
-  pointer-events: none;
-}
-
-.intro-canvas {
-  position: absolute;
-  left: var(--left, 50%);
-  top: var(--top, 50%);
-  z-index: var(--z, 1);
-  width: var(--w, 14rem);
-  aspect-ratio: 4 / 5;
-  background-color: #2a2622;
-  background-size: cover;
-  background-position: center 42%;
-  background-repeat: no-repeat;
-  box-shadow:
-    0 18px 40px rgba(0, 0, 0, 0.45),
-    0 1px 0 rgba(255, 255, 255, 0.08) inset;
-  filter: saturate(1.05) contrast(1.04) brightness(1.08);
-  transform: translate(-50%, -50%) rotate(var(--r, 0deg));
-}
-
-/* Soft veil only — paintings stay visible around the text */
-.intro-about::after {
-  content: "";
+.intro-about-bg {
   position: absolute;
   inset: 0;
-  z-index: 1;
+  z-index: 0;
   pointer-events: none;
   background:
-    radial-gradient(ellipse 52% 48% at 50% 48%, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0.12) 70%, transparent 100%);
+    url("images/intro-about.jpg") center 42% / cover no-repeat;
+}
+
+.intro-about-bg--blur {
+  z-index: 1;
+  filter: blur(18px) saturate(0.95) brightness(0.72);
+  transform: scale(1.06);
+  transform-origin: center bottom;
+  -webkit-mask-image: linear-gradient(
+    180deg,
+    transparent 0%,
+    transparent 38%,
+    rgba(0, 0, 0, 0.55) 58%,
+    #000 78%,
+    #000 100%
+  );
+  mask-image: linear-gradient(
+    180deg,
+    transparent 0%,
+    transparent 38%,
+    rgba(0, 0, 0, 0.55) 58%,
+    #000 78%,
+    #000 100%
+  );
+}
+
+.intro-about-veil {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 70% 60% at 50% 38%, rgba(0, 0, 0, 0.18) 0%, rgba(0, 0, 0, 0.55) 72%, rgba(0, 0, 0, 0.82) 100%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.28) 0%, rgba(0, 0, 0, 0.18) 36%, rgba(0, 0, 0, 0.72) 100%);
 }
 
 .intro-about-inner {
   position: relative;
-  z-index: 2;
+  z-index: 3;
   max-width: 36rem;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: clamp(1.6rem, 4vw, 2.1rem);
-  padding: clamp(1.5rem, 4vw, 2.15rem) clamp(1.25rem, 3.5vw, 1.85rem);
-  border-radius: 0.2rem;
-  background: rgba(10, 10, 10, 0.78);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+  gap: clamp(1.85rem, 4.5vw, 2.4rem);
 }
 
 .intro-about-block {
@@ -438,14 +438,16 @@ button {
   letter-spacing: -0.02em;
   line-height: 1.15;
   color: #fafafa;
+  text-shadow: 0 1px 18px rgba(0, 0, 0, 0.55);
 }
 
 .intro-about-text {
   margin: 0;
-  color: #e8e8e8;
+  color: #e6e6e6;
   font-size: clamp(1.02rem, 2.1vw, 1.12rem);
   line-height: 1.75;
   font-weight: 400;
+  text-shadow: 0 1px 14px rgba(0, 0, 0, 0.45);
 }
 
 @media (max-width: 640px) {
@@ -453,12 +455,8 @@ button {
     min-height: min(88dvh, 46rem);
   }
 
-  .intro-stack {
-    inset: -2% -10%;
-  }
-
-  .intro-canvas {
-    width: calc(var(--w, 14rem) * 0.72);
+  .intro-about-bg {
+    background-position: center 48%;
   }
 }
 

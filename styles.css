@@ -180,6 +180,7 @@ button {
 
 .intro-hero {
   position: relative;
+  z-index: 5;
   min-height: 100dvh;
   overflow: hidden;
   background: #000;
@@ -365,12 +366,13 @@ button {
   line-height: 1.75;
 }
 
-/* Layers: black bg (back) → scrolling text (mid) → sticky image (front) */
+/* Layers: black bg (back) → scrolling text (mid) → sticky image (front)
+   Hero stays above this stack so the sticky photo never paints over the main screen. */
 .intro-about {
   --about-front-h: 48vh;
   --about-top-h: 22vh;
   position: relative;
-  z-index: 3;
+  z-index: 1;
   background: #000;
   isolation: isolate;
 }

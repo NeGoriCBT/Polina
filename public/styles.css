@@ -421,6 +421,20 @@ button {
   position: absolute;
   inset: 0;
   background: url("images/intro-about.jpg") center top / cover no-repeat;
+  -webkit-mask-image: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(0, 0, 0, 0.35) 12%,
+    #000 28%,
+    #000 100%
+  );
+  mask-image: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(0, 0, 0, 0.35) 12%,
+    #000 28%,
+    #000 100%
+  );
 }
 
 .intro-about-veil {
@@ -431,6 +445,20 @@ button {
     rgba(0, 0, 0, 0.55) 0%,
     rgba(0, 0, 0, 0.12) 28%,
     rgba(0, 0, 0, 0.28) 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(0, 0, 0, 0.35) 12%,
+    #000 28%,
+    #000 100%
+  );
+  mask-image: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(0, 0, 0, 0.35) 12%,
+    #000 28%,
+    #000 100%
   );
 }
 

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Черновик: холсты на полу</title>
+  <title>Черновик: варианты фона</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -12,18 +12,14 @@
       --bg: #050505;
       --fg: #f2f2f2;
       --muted: #8a8a8a;
+      --line: #222;
       --font-display: "Cormorant Garamond", "Times New Roman", serif;
       --font-body: "Manrope", "Helvetica Neue", sans-serif;
     }
 
-    *,
-    *::before,
-    *::after {
-      box-sizing: border-box;
-    }
+    *, *::before, *::after { box-sizing: border-box; }
 
-    html,
-    body {
+    html, body {
       margin: 0;
       min-height: 100%;
       background: var(--bg);
@@ -33,205 +29,453 @@
     }
 
     .page {
-      position: relative;
-      min-height: 100dvh;
-      overflow: hidden;
-      background:
-        radial-gradient(ellipse 90% 55% at 50% 18%, #141414 0%, #070707 55%, #000 100%);
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 2rem clamp(1.1rem, 3vw, 2.5rem) 4rem;
     }
 
     .back {
-      position: absolute;
-      top: 1.25rem;
-      left: clamp(1rem, 3vw, 2rem);
-      z-index: 5;
       color: var(--muted);
       text-decoration: none;
       font-size: 0.85rem;
-      letter-spacing: 0.04em;
+    }
+    .back:hover { color: var(--fg); }
+
+    h1 {
+      margin: 1.2rem 0 0.4rem;
+      font-family: var(--font-display);
+      font-weight: 400;
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      letter-spacing: -0.02em;
     }
 
-    .back:hover {
-      color: var(--fg);
+    .lead {
+      margin: 0 0 2rem;
+      color: var(--muted);
+      max-width: 36rem;
+      line-height: 1.55;
     }
 
-    .title {
-      position: absolute;
-      top: 1.15rem;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 5;
+    .variant {
+      margin: 0 0 2.75rem;
+    }
+
+    .variant-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .variant-title {
       margin: 0;
       font-family: var(--font-display);
       font-weight: 400;
-      font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+      font-size: 1.35rem;
+    }
+
+    .variant-note {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    .frame {
+      position: relative;
+      height: min(62vh, 28rem);
+      overflow: hidden;
+      border: 1px solid var(--line);
+      background: #000;
+    }
+
+    .frame-label {
+      position: absolute;
+      left: 50%;
+      top: 42%;
+      transform: translate(-50%, -50%);
+      z-index: 4;
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: clamp(1.4rem, 3vw, 2rem);
       letter-spacing: -0.02em;
-      color: rgba(242, 242, 242, 0.7);
+      text-align: center;
+      text-shadow: 0 2px 24px rgba(0,0,0,0.7);
       pointer-events: none;
     }
 
-    .stage {
-      position: absolute;
-      inset: 0;
-      perspective: 900px;
-      perspective-origin: 50% 58%;
+    /* ——— 1. Gallery wall ——— */
+    .v-wall {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+      gap: 0.55rem;
+      padding: 1.1rem;
+      height: 100%;
+      background: #0c0c0c;
     }
+    .v-wall .tile {
+      background: #1a1714 center 40% / cover no-repeat;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.35);
+    }
+    .v-wall .tile:nth-child(3n) { transform: translateY(0.35rem); }
+    .v-wall .tile:nth-child(5n) { transform: translateY(-0.25rem); }
 
-    .floor {
+    /* ——— 2. Soft scatter ——— */
+    .v-scatter { position: absolute; inset: 0; }
+    .v-scatter .piece {
       position: absolute;
-      left: -10%;
-      right: -10%;
-      bottom: 0;
-      height: 42%;
+      width: var(--w);
+      aspect-ratio: 4/5;
+      left: var(--x);
+      top: var(--y);
+      background: #1a1714 center 42% / cover no-repeat;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+      transform: rotate(var(--r));
+      opacity: 0.92;
+    }
+    .v-scatter-veil {
+      position: absolute; inset: 0; z-index: 2;
       background:
-        linear-gradient(180deg, transparent 0%, rgba(255, 255, 255, 0.015) 18%, rgba(0, 0, 0, 0.55) 100%),
-        repeating-linear-gradient(
-          90deg,
-          rgba(255, 255, 255, 0.012) 0,
-          rgba(255, 255, 255, 0.012) 1px,
-          transparent 1px,
-          transparent 48px
-        );
-      transform-origin: center top;
-      transform: rotateX(62deg);
-      pointer-events: none;
+        radial-gradient(ellipse 60% 50% at 50% 45%, rgba(0,0,0,0.25), rgba(0,0,0,0.78) 75%);
     }
 
-    .floor-glow {
-      position: absolute;
-      left: 10%;
-      right: 10%;
-      bottom: 8%;
-      height: 28%;
-      background: radial-gradient(ellipse 70% 55% at 50% 40%, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
-      pointer-events: none;
-      filter: blur(8px);
+    /* ——— 3. Horizon row ——— */
+    .v-horizon {
+      position: absolute; inset: 0;
+      background: linear-gradient(180deg, #000 0%, #0a0a0a 55%, #111 100%);
     }
-
-    .wall-shadow {
+    .v-horizon-row {
       position: absolute;
-      inset: 0;
-      background:
-        linear-gradient(180deg, rgba(0, 0, 0, 0.35) 0%, transparent 28%),
-        radial-gradient(ellipse 80% 50% at 50% 100%, rgba(0, 0, 0, 0.55) 0%, transparent 60%);
-      pointer-events: none;
-      z-index: 2;
-    }
-
-    .canvases {
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: 10%;
-      height: 72%;
-      z-index: 1;
+      left: -2%;
+      right: -2%;
+      bottom: 12%;
       display: flex;
       align-items: flex-end;
       justify-content: center;
-      gap: clamp(0.35rem, 1.2vw, 1rem);
-      padding: 0 clamp(0.5rem, 2vw, 2rem);
-      transform-style: preserve-3d;
+      gap: 0.4rem;
     }
-
-    .canvas {
-      position: relative;
-      flex: 0 0 auto;
-      width: var(--w, 8rem);
-      aspect-ratio: 4 / 5;
+    .v-horizon-row .c {
+      width: var(--w);
+      aspect-ratio: 4/5;
       background: #1a1714 center 42% / cover no-repeat;
-      box-shadow:
-        0 18px 36px rgba(0, 0, 0, 0.55),
-        0 2px 0 rgba(255, 255, 255, 0.05) inset,
-        -1px 0 0 rgba(255, 255, 255, 0.04);
-      transform:
-        translateY(var(--y, 0))
-        rotate(var(--r, 0deg))
-        translateZ(var(--z, 0));
+      box-shadow: 0 12px 28px rgba(0,0,0,0.45);
+      transform: rotate(var(--r)) translateY(var(--y));
       transform-origin: 50% 100%;
-      filter: saturate(1.02) contrast(1.04);
+    }
+    .v-horizon-fade {
+      position: absolute; inset: 0; z-index: 2;
+      background: linear-gradient(180deg, #000 0%, transparent 35%, rgba(0,0,0,0.55) 100%);
     }
 
-    .canvas::after {
-      content: "";
-      position: absolute;
-      left: 8%;
-      right: 8%;
-      bottom: -10%;
-      height: 18%;
-      background: radial-gradient(ellipse 55% 50% at 50% 0%, rgba(0, 0, 0, 0.45) 0%, transparent 70%);
-      filter: blur(4px);
-      z-index: -1;
-      pointer-events: none;
+    /* ——— 4. Film strip ——— */
+    .v-strip {
+      position: absolute; inset: 0;
+      display: grid;
+      place-items: center;
+      background: #000;
+      overflow: hidden;
+    }
+    .v-strip-track {
+      display: flex;
+      gap: 0.75rem;
+      width: max-content;
+      animation: drift 48s linear infinite;
+    }
+    .v-strip-track .c {
+      width: 9.5rem;
+      aspect-ratio: 4/5;
+      background: #1a1714 center 42% / cover no-repeat;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+      flex: 0 0 auto;
+    }
+    @keyframes drift {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+    .v-strip-veil {
+      position: absolute; inset: 0; z-index: 2;
+      background:
+        linear-gradient(90deg, #000 0%, transparent 22%, transparent 78%, #000 100%),
+        radial-gradient(ellipse 50% 60% at 50% 50%, rgba(0,0,0,0.2), rgba(0,0,0,0.72));
     }
 
-    .hint {
+    /* ——— 5. Focus + ghosts ——— */
+    .v-focus { position: absolute; inset: 0; background: #000; }
+    .v-focus .ghost {
       position: absolute;
-      bottom: 1.25rem;
+      width: var(--w);
+      aspect-ratio: 4/5;
+      left: var(--x);
+      top: var(--y);
+      background: #1a1714 center 42% / cover no-repeat;
+      filter: blur(10px) saturate(0.7) brightness(0.55);
+      opacity: 0.55;
+      transform: rotate(var(--r));
+    }
+    .v-focus .hero {
+      position: absolute;
       left: 50%;
-      transform: translateX(-50%);
-      z-index: 5;
-      margin: 0;
-      color: var(--muted);
-      font-size: 0.8rem;
-      letter-spacing: 0.04em;
+      top: 46%;
+      width: min(38%, 14rem);
+      aspect-ratio: 4/5;
+      transform: translate(-50%, -50%);
+      background: #1a1714 center 42% / cover no-repeat;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.65);
+      z-index: 2;
+    }
+    .v-focus-veil {
+      position: absolute; inset: 0; z-index: 3;
+      background: radial-gradient(ellipse 45% 50% at 50% 46%, transparent 0%, rgba(0,0,0,0.55) 70%, rgba(0,0,0,0.85) 100%);
     }
 
-    @media (max-width: 720px) {
-      .canvases {
-        gap: 0.25rem;
-        bottom: 12%;
-        height: 68%;
-      }
+    /* ——— 6. Dark mosaic ——— */
+    .v-mosaic {
+      position: absolute; inset: 0;
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      grid-template-rows: repeat(8, 1fr);
+      gap: 2px;
+      background: #000;
+    }
+    .v-mosaic .cell {
+      background: #111 center / cover no-repeat;
+      opacity: 0.55;
+    }
+    .v-mosaic .cell.is-big {
+      grid-column: span 3;
+      grid-row: span 3;
+      opacity: 0.9;
+    }
+    .v-mosaic .cell.is-mid {
+      grid-column: span 2;
+      grid-row: span 2;
+      opacity: 0.75;
+    }
+    .v-mosaic-veil {
+      position: absolute; inset: 0; z-index: 2;
+      background:
+        radial-gradient(ellipse 55% 50% at 50% 45%, rgba(0,0,0,0.15), rgba(0,0,0,0.82) 80%);
+    }
 
-      .canvas {
-        width: calc(var(--w, 8rem) * 0.62) !important;
-      }
+    /* ——— 7. Lean stack ——— */
+    .v-lean {
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 70% 50% at 50% 30%, #121212, #000 70%);
+    }
+    .v-lean-pile {
+      position: absolute;
+      left: 50%;
+      bottom: 8%;
+      width: min(70%, 26rem);
+      height: 78%;
+      transform: translateX(-50%);
+    }
+    .v-lean-pile .c {
+      position: absolute;
+      left: 50%;
+      bottom: 0;
+      width: var(--w);
+      aspect-ratio: 4/5;
+      background: #1a1714 center 42% / cover no-repeat;
+      box-shadow: 0 18px 40px rgba(0,0,0,0.5);
+      transform: translateX(-50%) translateX(var(--x)) rotate(var(--r));
+      transform-origin: 50% 100%;
+    }
+    .v-lean-veil {
+      position: absolute; inset: 0; z-index: 2;
+      background: linear-gradient(180deg, rgba(0,0,0,0.55) 0%, transparent 40%, rgba(0,0,0,0.45) 100%);
     }
   </style>
 </head>
 <body>
   <div class="page">
     <a class="back" href="index.html">← на сайт</a>
-    <h1 class="title">Холсты на полу</h1>
+    <h1>Варианты фона</h1>
+    <p class="lead">Семь направлений. Выбери номер — соберём его на странице описания.</p>
 
-    <div class="stage" aria-hidden="true">
-      <div class="floor"></div>
-      <div class="floor-glow"></div>
-      <div class="canvases" id="canvases"></div>
-      <div class="wall-shadow"></div>
-    </div>
+    <!-- 1 -->
+    <section class="variant">
+      <div class="variant-head">
+        <h2 class="variant-title">1. Стена галереи</h2>
+        <p class="variant-note">ровная сетка, лёгкий сдвиг</p>
+      </div>
+      <div class="frame" id="v1">
+        <div class="v-wall" id="wall"></div>
+        <p class="frame-label">Одно дерево.</p>
+      </div>
+    </section>
 
-    <p class="hint">черновик фона · 18 картин как холсты</p>
+    <!-- 2 -->
+    <section class="variant">
+      <div class="variant-head">
+        <h2 class="variant-title">2. Россыпь</h2>
+        <p class="variant-note">хаотично, с вуалью под текст</p>
+      </div>
+      <div class="frame" id="v2">
+        <div class="v-scatter" id="scatter"></div>
+        <div class="v-scatter-veil"></div>
+        <p class="frame-label">Одно дерево.</p>
+      </div>
+    </section>
+
+    <!-- 3 -->
+    <section class="variant">
+      <div class="variant-head">
+        <h2 class="variant-title">3. Горизонт</h2>
+        <p class="variant-note">ряд у нижнего края, верх чёрный</p>
+      </div>
+      <div class="frame" id="v3">
+        <div class="v-horizon">
+          <div class="v-horizon-row" id="horizon"></div>
+          <div class="v-horizon-fade"></div>
+        </div>
+        <p class="frame-label">Одно дерево.</p>
+      </div>
+    </section>
+
+    <!-- 4 -->
+    <section class="variant">
+      <div class="variant-head">
+        <h2 class="variant-title">4. Лента</h2>
+        <p class="variant-note">медленный горизонтальный дрейф</p>
+      </div>
+      <div class="frame" id="v4">
+        <div class="v-strip">
+          <div class="v-strip-track" id="strip"></div>
+          <div class="v-strip-veil"></div>
+        </div>
+        <p class="frame-label">Одно дерево.</p>
+      </div>
+    </section>
+
+    <!-- 5 -->
+    <section class="variant">
+      <div class="variant-head">
+        <h2 class="variant-title">5. Фокус</h2>
+        <p class="variant-note">одна чёткая, остальные размытые</p>
+      </div>
+      <div class="frame" id="v5">
+        <div class="v-focus" id="focus"></div>
+        <div class="v-focus-veil"></div>
+        <p class="frame-label">Одно дерево.</p>
+      </div>
+    </section>
+
+    <!-- 6 -->
+    <section class="variant">
+      <div class="variant-head">
+        <h2 class="variant-title">6. Мозаика</h2>
+        <p class="variant-note">плотная тёмная сетка разных масштабов</p>
+      </div>
+      <div class="frame" id="v6">
+        <div class="v-mosaic" id="mosaic"></div>
+        <div class="v-mosaic-veil"></div>
+        <p class="frame-label">Одно дерево.</p>
+      </div>
+    </section>
+
+    <!-- 7 -->
+    <section class="variant">
+      <div class="variant-head">
+        <h2 class="variant-title">7. Стопка</h2>
+        <p class="variant-note">холсты опираются друг на друга</p>
+      </div>
+      <div class="frame" id="v7">
+        <div class="v-lean">
+          <div class="v-lean-pile" id="lean"></div>
+          <div class="v-lean-veil"></div>
+        </div>
+        <p class="frame-label">Одно дерево.</p>
+      </div>
+    </section>
   </div>
 
   <script>
-    const layouts = [
-      { n: 3,  w: "5.2rem",  r: "-8deg",  y: "1.2rem",  z: "-40px" },
-      { n: 12, w: "6.4rem",  r: "5deg",   y: "0.4rem",  z: "-20px" },
-      { n: 7,  w: "9.5rem",  r: "-3deg",  y: "0",       z: "10px" },
-      { n: 15, w: "4.8rem",  r: "9deg",   y: "1.6rem",  z: "-50px" },
-      { n: 1,  w: "11.5rem", r: "-1.5deg", y: "-0.2rem", z: "30px" },
-      { n: 10, w: "7.2rem",  r: "4deg",   y: "0.8rem",  z: "-10px" },
-      { n: 18, w: "13rem",   r: "1deg",   y: "0",       z: "40px" },
-      { n: 5,  w: "8.4rem",  r: "-6deg",  y: "0.3rem",  z: "0" },
-      { n: 14, w: "5.6rem",  r: "7deg",   y: "1.4rem",  z: "-30px" },
-      { n: 2,  w: "10.2rem", r: "-2deg",  y: "0",       z: "20px" },
-      { n: 9,  w: "6.8rem",  r: "3deg",   y: "0.9rem",  z: "-15px" },
-      { n: 16, w: "4.4rem",  r: "-10deg", y: "1.8rem",  z: "-55px" },
-      { n: 6,  w: "9rem",    r: "2.5deg", y: "0.2rem",  z: "5px" },
-      { n: 11, w: "7.8rem",  r: "-4deg",  y: "0.6rem",  z: "-5px" },
-      { n: 4,  w: "5rem",    r: "8deg",   y: "1.5rem",  z: "-45px" },
-      { n: 17, w: "12rem",   r: "-1deg",  y: "-0.1rem", z: "35px" },
-      { n: 8,  w: "6.2rem",  r: "5.5deg", y: "1rem",    z: "-25px" },
-      { n: 13, w: "8.8rem",  r: "-3.5deg", y: "0.35rem", z: "8px" },
-    ];
+    const nums = Array.from({ length: 18 }, (_, i) => i + 1);
+    const url = (n) => `images/tree-${n}.jpg`;
 
-    const root = document.getElementById("canvases");
-    root.innerHTML = layouts
-      .map(
-        (c) =>
-          `<div class="canvas" style="--w:${c.w}; --r:${c.r}; --y:${c.y}; --z:${c.z}; background-image:url('images/tree-${c.n}.jpg')"></div>`
-      )
+    // 1 wall
+    document.getElementById("wall").innerHTML = nums
+      .map((n) => `<div class="tile" style="background-image:url('${url(n)}')"></div>`)
+      .join("");
+
+    // 2 scatter
+    const scatterPos = [
+      ["8%", "6%", "7rem", "-12deg"], ["78%", "4%", "8.5rem", "8deg"],
+      ["4%", "38%", "9rem", "-6deg"], ["86%", "34%", "7.5rem", "11deg"],
+      ["18%", "58%", "11rem", "4deg"], ["62%", "62%", "10rem", "-7deg"],
+      ["40%", "8%", "12rem", "-3deg"], ["55%", "28%", "9.5rem", "5deg"],
+      ["28%", "30%", "8rem", "9deg"], ["70%", "48%", "13rem", "-4deg"],
+      ["12%", "72%", "6.5rem", "6deg"], ["48%", "70%", "7rem", "-9deg"],
+    ];
+    document.getElementById("scatter").innerHTML = scatterPos
+      .map((p, i) => {
+        const [x, y, w, r] = p;
+        return `<div class="piece" style="--x:${x};--y:${y};--w:${w};--r:${r};background-image:url('${url(nums[i])}')"></div>`;
+      })
+      .join("");
+
+    // 3 horizon
+    const horizon = [
+      ["5rem", "-8deg", "1.2rem"], ["6.5rem", "5deg", "0.4rem"], ["9rem", "-2deg", "0"],
+      ["4.8rem", "9deg", "1.5rem"], ["11rem", "1deg", "0"], ["7.2rem", "-5deg", "0.6rem"],
+      ["8.4rem", "3deg", "0.2rem"], ["5.6rem", "-7deg", "1rem"], ["10rem", "2deg", "0"],
+      ["6.8rem", "6deg", "0.7rem"], ["7.8rem", "-3deg", "0.3rem"], ["9.5rem", "1.5deg", "0"],
+    ];
+    document.getElementById("horizon").innerHTML = horizon
+      .map((h, i) => {
+        const [w, r, y] = h;
+        return `<div class="c" style="--w:${w};--r:${r};--y:${y};background-image:url('${url(nums[i])}')"></div>`;
+      })
+      .join("");
+
+    // 4 strip (duplicated for loop)
+    const stripImgs = [...nums, ...nums].map((n) => `<div class="c" style="background-image:url('${url(n)}')"></div>`).join("");
+    document.getElementById("strip").innerHTML = stripImgs;
+
+    // 5 focus
+    const ghosts = [
+      ["6%", "10%", "8rem", "-10deg"], ["80%", "8%", "9rem", "7deg"],
+      ["10%", "55%", "10rem", "5deg"], ["78%", "52%", "8.5rem", "-6deg"],
+      ["40%", "8%", "7rem", "4deg"], ["55%", "62%", "11rem", "-3deg"],
+    ];
+    document.getElementById("focus").innerHTML =
+      ghosts.map((g, i) => {
+        const [x, y, w, r] = g;
+        return `<div class="ghost" style="--x:${x};--y:${y};--w:${w};--r:${r};background-image:url('${url(nums[i + 2])}')"></div>`;
+      }).join("") +
+      `<div class="hero" style="background-image:url('${url(1)}')"></div>`;
+
+    // 6 mosaic
+    const mosaic = document.getElementById("mosaic");
+    let cells = "";
+    let n = 0;
+    const pattern = ["big", "mid", "s", "s", "mid", "s", "big", "s", "s", "mid", "s", "s", "mid", "s", "big", "s"];
+    for (const kind of pattern) {
+      n = (n % 18) + 1;
+      const cls = kind === "big" ? "is-big" : kind === "mid" ? "is-mid" : "";
+      cells += `<div class="cell ${cls}" style="background-image:url('${url(n)}')"></div>`;
+    }
+    // fill remaining small cells
+    for (let i = 0; i < 40; i++) {
+      n = (n % 18) + 1;
+      cells += `<div class="cell" style="background-image:url('${url(n)}')"></div>`;
+    }
+    mosaic.innerHTML = cells;
+
+    // 7 lean stack
+    const lean = [
+      ["10rem", "-18deg", "-4.5rem"], ["11rem", "-12deg", "-3rem"],
+      ["12rem", "-6deg", "-1.5rem"], ["13rem", "0deg", "0"],
+      ["12.5rem", "5deg", "1.4rem"], ["11.5rem", "11deg", "2.8rem"],
+      ["10.5rem", "16deg", "4.2rem"],
+    ];
+    document.getElementById("lean").innerHTML = lean
+      .map((l, i) => {
+        const [w, r, x] = l;
+        return `<div class="c" style="--w:${w};--r:${r};--x:${x};background-image:url('${url(nums[i * 2 + 1])}');z-index:${i}"></div>`;
+      })
       .join("");
   </script>
 </body>

@@ -369,8 +369,48 @@ button {
   position: relative;
   z-index: 3;
   overflow: hidden;
+  min-height: min(92dvh, 54rem);
   padding: clamp(4rem, 10vw, 6.5rem) clamp(1.25rem, 4vw, 3rem) 5.5rem;
-  background: #000;
+  background: #111;
+}
+
+.intro-stack {
+  position: absolute;
+  inset: -4% -6%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.intro-canvas {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: var(--z, 1);
+  width: var(--w, 14rem);
+  aspect-ratio: 4 / 5;
+  background-color: #2a2622;
+  background-size: cover;
+  background-position: center 42%;
+  background-repeat: no-repeat;
+  box-shadow:
+    0 18px 40px rgba(0, 0, 0, 0.45),
+    0 1px 0 rgba(255, 255, 255, 0.08) inset;
+  filter: saturate(1.05) contrast(1.04) brightness(1.08);
+  transform:
+    translate(-50%, -50%)
+    translate(var(--x, 0), var(--y, 0))
+    rotate(var(--r, 0deg));
+}
+
+/* Soft veil only — paintings stay visible around the text */
+.intro-about::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 52% 48% at 50% 48%, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0.12) 70%, transparent 100%);
 }
 
 .intro-about-inner {
@@ -380,7 +420,13 @@ button {
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: clamp(2.1rem, 5vw, 3rem);
+  gap: clamp(1.6rem, 4vw, 2.1rem);
+  padding: clamp(1.5rem, 4vw, 2.15rem) clamp(1.25rem, 3.5vw, 1.85rem);
+  border-radius: 0.2rem;
+  background: rgba(10, 10, 10, 0.78);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
 }
 
 .intro-about-block {
@@ -388,21 +434,35 @@ button {
 }
 
 .intro-about-title {
-  margin: 0 0 0.85rem;
+  margin: 0 0 0.75rem;
   font-family: var(--font-display);
   font-weight: 400;
   font-size: clamp(1.55rem, 3.5vw, 2rem);
   letter-spacing: -0.02em;
   line-height: 1.15;
-  color: #f5f5f5;
+  color: #fafafa;
 }
 
 .intro-about-text {
   margin: 0;
-  color: #cfcfcf;
+  color: #e8e8e8;
   font-size: clamp(1.02rem, 2.1vw, 1.12rem);
   line-height: 1.75;
   font-weight: 400;
+}
+
+@media (max-width: 640px) {
+  .intro-about {
+    min-height: min(88dvh, 46rem);
+  }
+
+  .intro-stack {
+    inset: -2% -10%;
+  }
+
+  .intro-canvas {
+    width: calc(var(--w, 14rem) * 0.72);
+  }
 }
 
 .fade-line {

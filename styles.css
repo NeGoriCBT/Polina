@@ -383,8 +383,8 @@ button {
 
 .intro-canvas {
   position: absolute;
-  left: 50%;
-  top: 50%;
+  left: var(--left, 50%);
+  top: var(--top, 50%);
   z-index: var(--z, 1);
   width: var(--w, 14rem);
   aspect-ratio: 4 / 5;
@@ -396,10 +396,7 @@ button {
     0 18px 40px rgba(0, 0, 0, 0.45),
     0 1px 0 rgba(255, 255, 255, 0.08) inset;
   filter: saturate(1.05) contrast(1.04) brightness(1.08);
-  transform:
-    translate(-50%, -50%)
-    translate(var(--x, 0), var(--y, 0))
-    rotate(var(--r, 0deg));
+  transform: translate(-50%, -50%) rotate(var(--r, 0deg));
 }
 
 /* Soft veil only — paintings stay visible around the text */

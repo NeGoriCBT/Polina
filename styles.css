@@ -365,64 +365,71 @@ button {
   line-height: 1.75;
 }
 
+/* Layers: black bg (back) → scrolling text (mid) → sticky image (front) */
 .intro-about {
+  --about-front-h: 48vh;
+  --about-top-h: 22vh;
   position: relative;
   z-index: 3;
-  overflow: hidden;
-  min-height: 100dvh;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  padding: clamp(3.5rem, 8vw, 5.5rem) clamp(1.25rem, 4vw, 3rem) 5rem;
   background: #000;
+  isolation: isolate;
 }
 
-/* Image only in the lower half; top stays pure black */
-.intro-about-bg {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 54%;
-  z-index: 0;
+/* Front-top black mask: text disappears under it */
+.intro-about-top {
+  position: sticky;
+  top: 0;
+  z-index: 4;
+  height: var(--about-top-h);
+  margin-bottom: calc(var(--about-top-h) * -1);
   pointer-events: none;
-  background:
-    url("images/intro-about.jpg") center top / cover no-repeat;
+  background: linear-gradient(180deg, #000 0%, #000 55%, rgba(0, 0, 0, 0) 100%);
 }
 
-.intro-about-veil {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 54%;
-  z-index: 1;
-  pointer-events: none;
-  background:
-    linear-gradient(180deg, #000 0%, rgba(0, 0, 0, 0.52) 16%, rgba(0, 0, 0, 0.22) 40%, rgba(0, 0, 0, 0.58) 100%);
-}
-
-.intro-about-veil::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: url("images/intro-about.jpg") center top / cover no-repeat;
-  filter: blur(16px) brightness(0.75);
-  transform: scale(1.08);
-  transform-origin: center bottom;
-  opacity: 0.85;
-  -webkit-mask-image: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.45) 35%, #000 70%);
-  mask-image: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.45) 35%, #000 70%);
+/* Mid layer: text travels up from behind the image */
+.intro-about-track {
+  position: relative;
+  z-index: 2;
+  padding:
+    calc(var(--about-front-h) + 8vh)
+    clamp(1.25rem, 4vw, 3rem)
+    calc(var(--about-front-h) + 30vh);
 }
 
 .intro-about-inner {
   position: relative;
-  z-index: 2;
   max-width: 36rem;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: clamp(1.85rem, 4.5vw, 2.4rem);
+  gap: clamp(2.4rem, 6vw, 3.4rem);
+}
+
+/* Front layer: sticky picture at the bottom */
+.intro-about-front {
+  position: sticky;
+  bottom: 0;
+  z-index: 3;
+  height: var(--about-front-h);
+  margin-top: calc(var(--about-front-h) * -1);
+  pointer-events: none;
+}
+
+.intro-about-bg {
+  position: absolute;
+  inset: 0;
+  background: url("images/intro-about.jpg") center top / cover no-repeat;
+}
+
+.intro-about-veil {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.55) 0%,
+    rgba(0, 0, 0, 0.12) 28%,
+    rgba(0, 0, 0, 0.28) 100%
+  );
 }
 
 .intro-about-block {
@@ -450,9 +457,9 @@ button {
 }
 
 @media (max-width: 640px) {
-  .intro-about-bg,
-  .intro-about-veil {
-    height: 62%;
+  .intro-about {
+    --about-front-h: 42vh;
+    --about-top-h: 18vh;
   }
 }
 
